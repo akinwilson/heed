@@ -1,0 +1,60 @@
+FROM nvcr.io/nvidia/tensorrt:22.08-py3
+LABEL maintainer="Akinola Antony Wilson <akinola.wilson@sky.com>"
+
+# Allow passing in decision threshold and model version during build of serving container.
+ARG DECISION_THRESHOLD=0.5
+ARG MODEL_VERSION="docker-env-model-version"
+# Setting decision_threshold and model_version and env vars 
+ENV DECISION_THRESHOLD=${DECISION_THRESHOLD}
+ENV MODEL_VERSION=${MODEL_VERSION}
+# install utilities
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y curl
+# audio processing dependencies 
+RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
+RUN apt-get install -y libsndfile-dev
+# Install python 
+RUN apt-get install -y python3
+RUN apt-get install -y python3-pip
+# install protobuf dependencies
+RUN apt-get install protobuf-compiler libprotobuf-dev -y 
+
+
+# Installing python dependencies
+RUN python3 -m pip --no-cache-dir install --upgrade pip && \
+    python3 --version && \
+    pip3 --version
+
+# install gpu-enabled torch 
+RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113 
+
+
+# check https://github.com/onnx/onnx-tensorrt/issues/354#issuecomment-572279735 ---> 
+RUN git clone --recurse-submodules https://github.com/onnx/onnx-tensorrt.git
+WORKDIR /workspace/onnx-tensorrt
+
+RUN mkdir build
+WORKDIR /workspace/onnx-tensorrt/build
+
+RUN cmake .. -DTENSORRT_ROOT=/workspace/tensorrt
+RUN make -j
+
+RUN export LD_LIBRARY_PATH=$PWD:$LD_LIBRARY_PATH
+
+WORKDIR /workspace
+
+COPY ./torch-deploy/requirements.txt .
+RUN pip3 --timeout=300 --no-cache-dir install -r requirements.txt
+
+# Copy model files
+COPY ./torch-deploy/model /model
+RUN pip3 --timeout=300 --no-cache-dir install -r requirements.txt
+# Copy app files
+COPY ./torch-deploy/app /app
+
+
+COPY ./torch-deploy/start.sh /start.sh
+RUN chmod +x /start.sh
+
+EXPOSE 80
+CMD ["/bin/bash"]
