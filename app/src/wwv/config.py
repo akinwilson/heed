@@ -1,0 +1,88 @@
+'''
+Processing, training, data, model and augmentation configuration 
+definition
+'''
+import numpy as np 
+import json
+import os
+from dataclasses import asdict, dataclass, field
+from pathlib import Path 
+
+
+
+@dataclass
+class DataPaths:
+    root_data_dir : str  = field(
+        metadata={
+            "help": "Root directory of training, validation and testing csv files"
+        }
+    )
+
+    model_name : str = field(
+        metadata={
+            "help": "Name of model. Will be used to create model_dir"
+        }
+    )
+    root_model_dir : str  = field(
+        metadata={
+            "help": "Root directory for outputs of training process"
+        }
+    )
+
+    model_dir : str = field(
+        init=False,
+        metadata={
+            "help": "Directory for outputs of training process. Will be created after init"
+        }
+    )
+
+    
+    def __post_init__(self):
+        expected_files = ["train.csv", "test.csv", "val.csv"]
+        if not all(x in os.listdir(self.root_data_dir) for x in expected_files):
+            raise FileNotFoundError(f"Expected: {expected_files}\nTo exist in dir: {self.root_data_dir}.\nOnly found: {os.listdir(self.root_data_dir)}")
+
+        model_dir = (Path(self.root_model_dir) / self.model_name)
+        model_dir.mkdir(parents=True, exist_ok=True)
+        self.model_dir = str(model_dir)
+        
+
+
+
+    
+
+
+class Config:
+    def __init__(self, params):
+        self.model_name = params['model_name']
+        self.audio_feature = params['audio_feature']
+        self.audio_duration = params['audio_duration']
+        self.sr = params['sample_rate']
+        self.audio_feature_param = params['audio_feature_param']
+        self.augmentation = params['augmentation']
+        self.augmentation_param =  params['augmentation_param']
+        self.fit_param = params['fit_param']
+        self.data_param = params['data_param']
+        self.path = params['path']
+        self.verbose = params['verbose']# True 
+
+    @property
+    def max_sample_len(self):
+        return int(self.audio_duration * self.sr)
+
+    @property 
+    def processing_output_shape(self):
+        attrname = 'audio_feature_param'
+        if self.audio_feature == "mfcc":
+            n_mfcc =  getattr(self,attrname)[self.audio_feature]['n_mfcc']
+            hop_len = getattr(self,attrname)[self.audio_feature]['hop_length']
+            time_step = int(np.around(self.max_sample_len / hop_len, 0))
+            return  (n_mfcc, time_step)
+        if self.audio_feature == "spectrogram":
+            freq_bins =  getattr(self,attrname)[self.audio_feature]["n_mels"]
+            hop_len =  getattr(self,attrname)[self.audio_feature]["hop_length"]
+            time_steps = int(np.around(self.max_sample_len / hop_len, 0))
+            return  (freq_bins,time_steps)
+        if self.audio_feature == "pcm":
+            return self.max_sample_len
+

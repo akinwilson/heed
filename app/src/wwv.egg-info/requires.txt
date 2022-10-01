@@ -1,0 +1,8 @@
+torch-audiomentations>=0.11.0
+nnAudio>=0.3.0
+torchvision>=0.13.0
+transformers>=4.21.2
+pytorch-lightning>=1.7.4
+pydantic>=1.10.1
+pandas>=1.0.4
+matplotlib>=3.5.1
