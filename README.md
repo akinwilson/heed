@@ -28,3 +28,6 @@ supported in opset 17.
 - [ ] Create a presentation as to why 
 - [ ] From onnx to TFlite -> implement basic converted and test against chris
   butcher
+- [ ] factor out environment variables from docker container, place in file and
+  load in at runtime docker run --env-args ... 
+- [ ] Add more models to model collection, try finding span prediction dataset.
