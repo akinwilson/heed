@@ -4,9 +4,11 @@ LABEL maintainer="Akinola Antony Wilson <akinola.wilson@sky.com>"
 # Allow passing in decision threshold and model version during build of serving container.
 ARG DECISION_THRESHOLD=0.5
 ARG MODEL_VERSION="docker-env-model-version"
+ARG EXECUTION_PROVIDER="TensorrtExecutionProvider"
 # Setting decision_threshold and model_version and env vars 
 ENV DECISION_THRESHOLD=${DECISION_THRESHOLD}
 ENV MODEL_VERSION=${MODEL_VERSION}
+ENV EXECUTION_PROVIDER=${EXECUTION_PROVIDER}
 # install utilities
 RUN apt-get update && \
     apt-get install --no-install-recommends -y curl
