@@ -18,9 +18,9 @@ When serving the model, the same transformations that are applied during the
 data loading stage need to be applied whilst endpoint of the model is queried 
 <br>
 To do:
-- [] Move trainer into train.py from notebook 
-- [] Parameterise trainer whilst in the pipeline
-- [] Find a way to inlucde programmatically in the data loader, what
+- [ ] Move trainer into train.py from notebook 
+- [ ] Parameterise trainer whilst in the pipeline
+- [ ] Find a way to inlucde programmatically in the data loader, what
   transformation to apply. 
-- [] Include functional augmentation in the dataloader 
+- [ ] Include functional augmentation in the dataloader 
 
