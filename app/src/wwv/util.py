@@ -22,7 +22,6 @@ class OnnxExporter:
         assert not self.model.training, "Model not in inference mode before exporting to onnx format"
         # Input to the model
         batch_size = 1
-        # dummy tensor for tracing purporses
         # Get expected input dims from config cfg.processing_output_shape = (40, 241)
         self.x_in = torch.randn(batch_size, 1, 40, 241, device="cpu")
 
@@ -30,7 +29,6 @@ class OnnxExporter:
         self.x_out = self.model(self.x_in)
         logger.info(f"Output given input for model tracing: {self.x_out.shape}")
         self.onnx_model_path=None
-
 
 
     def verify(self):
@@ -50,14 +48,8 @@ class OnnxExporter:
 
         logger.info(f"Onnx model output path: {output_path}")
 
-        # if isinstance(self.model, torch.nn.DataParallel):
-        #     # if dist training, extract module for onnx exporting
-        #     model = self.model.module 
-        # else:
-        #     model = self.model
-
         model = self.model
-        x_dummy =  self.x_in # self.to_numpy(self.x_in)
+        x_dummy =  self.x_in 
         torch.onnx.export(model=model,                                       # model being run
                          args=x_dummy,                                       # model input (or a tuple for multiple inputs)
                          f=output_path,                                      # where to save the model (can be a file or file-like object)
@@ -87,3 +79,5 @@ class OnnxExporter:
         # compare ONNX Runtime and PyTorch results
         np.testing.assert_allclose(self.to_numpy(self.x_out), ort_outs[0], rtol=1e-03, atol=1e-05)
         logger.info("Exported model has been tested with ONNXRuntime, and the result looks good!")
+
+        
