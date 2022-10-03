@@ -5,7 +5,7 @@ Create a virtual environment and whilst in it, run the command:
 `pip install -r requirements.txt` 
 and then 
 `pip install -e ./app` 
-This will install the depencies and python package that contains the ML code. 
+This will install the dependencies and python package that contains the ML code. 
 
 
 
