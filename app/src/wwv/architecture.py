@@ -228,7 +228,7 @@ class VecM5(nn.Module):
 
 
 
-class FullyConnected(torch.nn.Module):
+class FullyConnected(nn.Module):
     """
     Args:
         n_feature: Number of input features
@@ -254,7 +254,7 @@ class FullyConnected(torch.nn.Module):
 
 
 
-class DeepSpeech(torch.nn.Module):
+class DeepSpeech(nn.Module):
     def __init__(self,cfg):
         super().__init__()
         n_feature = cfg.max_sample_len 
@@ -286,16 +286,6 @@ class DeepSpeech(torch.nn.Module):
 
 
 
-
-
-
-
-
-
-class Resnet2vec1D(nn.Module):
-    pass 
-
-
 # class SpecResnet2D(nn.Module):
 #     def __init__(self, cfg):
 #         super().__init__()
@@ -319,7 +309,17 @@ MODELS = {
 }
 
 
-
+##################################################################################################################################
+#  Old style init architectue 
+#
+# Old because until opset 17 is avialable for Onnx, fourier related operations are not availbe during the trancing/scripting 
+# process the models-to-be-exported undergo 
+# 
+# See the example https://pytorch.org/audio/stable/_modules/torchaudio/models/wav2vec2/model.html#Wav2Vec2Model
+# To see how to make a non-native function exportable. 
+# In particular, notice the decorate placed ontop of the feature extractor that huggingface offers, I want to be able to export 
+# the extractor in a simliar manner
+##################################################################################################################################
 class Architecture(nn.Module):
     '''
     Architecture wrapper. 
