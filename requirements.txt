@@ -223,7 +223,6 @@ wcwidth==0.2.5
 webencodings==0.5.1
 websocket-client==1.4.1
 Werkzeug==2.2.2
--e git+https://github.com/akinwilson/end-to-end.git@98b72e8e9260fc54476339f849e5b003dcb1fe93#egg=wwv&subdirectory=app
 xxhash==3.0.0
 yarl==1.8.1
 zc.lockfile==2.0
