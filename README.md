@@ -24,14 +24,13 @@ At the moment, the easiest way for you to get a model.onnx file to test the endp
 
 
 ### Building deployment container
-Run: 
-`docker build . -f torch-deploy/Dockerfile -t serve:latest`
-From the directory level of this README.md file. The build context needs access to the model definition at the moment and install the python package locally. 
-This will build the docker images
 
-Run:
+To Build the image locally run:
 `docker build . -f torch-deploy/Dockerfile.tensorrt -t serve:latest`
-To Build the image locally.
+
+To deploy the image and test the endpoint, run:
+ `docker run --gpus all -p 8080:80 -e "WORKERS=1" -e "EXECUTION_PROVIDER=TensorrtExecutionProvider"  --name="rt_test" -it serve:latest`
+ <br><br>
 **Note** You will need to move a `model.onnx` into the `/torch-deploy/model` directory if you wish to deploy a model. 
 
 Running the image iteractively 
