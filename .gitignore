@@ -10,3 +10,4 @@ speech_commands_v0.02.tar.gz
 *.ckpt
 *.onnx
 *.pt
+*__pycache__*
