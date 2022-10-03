@@ -1,5 +1,14 @@
 # Notes for devs 
 
+### Create environment
+Create a virtual environment and whilst in it, run the command: 
+`pip install -r requirements.txt` 
+and then 
+`pip install -e ./app` 
+This will install the depencies and python package that contains the ML code. 
+
+
+
 ### Getting dataset 
 Using DVC to store data remotely, such that you can fetch it when you try to run this repo. To get the dataset please make sure you have DVC installed. You can install it via pip or your system package manager. 
 
