@@ -1,10 +1,6 @@
 # Notes for devs 
 
 
-
-
-
-
 ### Building deployment container
 Run: 
 `docker build . -f torch-deploy/Dockerfile -t serve:latest`
