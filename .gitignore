@@ -9,3 +9,4 @@ speech_commands_v0.02.tar.gz
 *.pt
 *__pycache__*
 /dataset
+.~lock.reducing-inference-time.odp#
