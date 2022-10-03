@@ -1,8 +1,5 @@
 output/
 .ipynb_checkpoints/
-SpeechCommands/
-datasets/
-dataset/
 data/
 img/
 lightning_logs/
