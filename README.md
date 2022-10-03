@@ -1,5 +1,18 @@
 # Notes for devs 
 
+### Getting dataset 
+Using DVC to store data remotely, such that you can fetch it when you try to run this repo. To get the dataset please make sure you have DVC installed. You can install it via pip or your system package manager. 
+
+run the command: 
+`dvc pull`
+This will create a directory called `/dataset/keywords` with the required data to train the model
+
+If you dont have relevant .csv files pulled via DVC, please just run the `/notebooks/get-data.ipynb` notebook. It will look for those files pull by DVC (the audio files) and create the train, val and test split, along with the csv files. 
+
+### Getting a model 
+
+At the moment, the easiest way for you to get a model.onnx file to test the endpoint is via running the first couple of cells of `/notebooks/arch-testing.ipynb`. You will have a directory produces called `/output` in the root directory of the repository. In there you will find the `model.onnx` that is needed to be placed into the `/torch-deploy/model` directory, for the deployment to work. 
+
 
 ### Building deployment container
 Run: 
@@ -9,7 +22,8 @@ This will build the docker images
 
 Run:
 `docker build . -f torch-deploy/Dockerfile.tensorrt -t serve:latest`
-To Build the image locally 
+To Build the image locally.
+**Note** You will need to move a `model.onnx` into the `/torch-deploy/model` directory if you wish to deploy a model. 
 
 Running the image iteractively 
 `docker run --gpus all -p 8080:8080 -it serve:latest /bin/bash`

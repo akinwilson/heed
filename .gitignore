@@ -1,8 +1,5 @@
 output/
 .ipynb_checkpoints/
-SpeechCommands/
-datasets/
-dataset/
 data/
 img/
 lightning_logs/
@@ -11,3 +8,4 @@ speech_commands_v0.02.tar.gz
 *.onnx
 *.pt
 *__pycache__*
+/dataset
