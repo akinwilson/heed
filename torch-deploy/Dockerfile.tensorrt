@@ -8,6 +8,8 @@ ARG EXECUTION_PROVIDER="TensorrtExecutionProvider"
 # Setting decision_threshold and model_version and env vars 
 ENV DECISION_THRESHOLD=${DECISION_THRESHOLD}
 ENV MODEL_VERSION=${MODEL_VERSION}
+# setting environment variable specifying execution provider, can be: CUDAExecutionProvider, CPUExecutionProvider or TensorrtExecutionProvider
+
 ENV EXECUTION_PROVIDER=${EXECUTION_PROVIDER}
 # install utilities
 RUN apt-get update && \
@@ -55,8 +57,9 @@ RUN pip3 --timeout=300 --no-cache-dir install -r requirements.txt
 COPY ./torch-deploy/app /app
 
 
-COPY ./torch-deploy/start.sh /start.sh
-RUN chmod +x /start.sh
+COPY ./torch-deploy/start.sh /app/start.sh
+RUN chmod +x /app/start.sh
 
+WORKDIR /app
 EXPOSE 80
-CMD ["/bin/bash"]
+ENTRYPOINT ["./start.sh"]
