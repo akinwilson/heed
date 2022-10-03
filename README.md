@@ -16,6 +16,7 @@ Run:
 To deploy the TensorRT serving image
 
 To do:
+3rd October 2022
 - [x] Get one architecture working, as in fitting, and saving 
 - [ ] Normalisation approach: apply PCEN https://github.com/daemon/pytorch-pcen
 - [x] change the output of networks to be logits let Routine function handle 
