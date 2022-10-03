@@ -3,7 +3,11 @@
 ### Getting dataset 
 Using DVC to store data remotely, such that you can fetch it when you try to run this repo. To get the dataset please make sure you have DVC installed. You can install it via pip or your system package manager. 
 
-If you dont have relevant .csv files pulled via DVC, please just run the `/notebooks/get-data.ipynb` notebook. It will look for those files pull by DVC and create the train, val and test split, along with the csv files. 
+run the command: 
+`dvc pull`
+This will create a directory called `/dataset/keywords` with the required data to train the model
+
+If you dont have relevant .csv files pulled via DVC, please just run the `/notebooks/get-data.ipynb` notebook. It will look for those files pull by DVC (the audio files) and create the train, val and test split, along with the csv files. 
 
 ### Getting a model 
 
