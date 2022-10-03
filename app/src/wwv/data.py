@@ -71,7 +71,11 @@ class AudioDataset(Dataset):
                 }
                 
             }
+        ##########################################################
+        #              Need to parameterised this
+        ##########################################################
         self.x_mfcc = torchaudio.transforms.MFCC(melkwargs=kwargs)
+        ##########################################################
         self.cfg = cfg
 
 
@@ -85,9 +89,13 @@ class AudioDataset(Dataset):
         x_path = self.df.loc[idx]['wav_path']
         y =  torch.tensor(int(y), device=device)
         x,_ = ta.load(x_path)
+        ##########################################################
+        #   Need to mimic this inside the serving container
+        ##########################################################
         x = self.x_scale(x)
         x = self.x_pad(x)
         x = self.x_mfcc(x)
+        ##########################################################
         return x,y
 
 
