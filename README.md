@@ -13,9 +13,13 @@ To Build the image locally
 
 Running the image iteractively 
 `docker run --gpus all -p 8080:8080 -it serve:latest /bin/bash`
+<br>
 **Note** This will require Nvidia docker. You will enter the container at `/workspace`. 
 
-Enter the command: `../app && python main.py` to start the server`
+Enter the command: `../app && python main.py` 
+To start the server. Obviously you can start the server with single command  
+Go to http://0.0.0.0:8080/docs to test out the enpoint via the swagger UI. 
+
 To do:
 3rd October 2022
 - [x] Get one architecture working, as in fitting, and saving 
