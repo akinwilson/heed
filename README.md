@@ -14,6 +14,8 @@ To deploy the TensorRT serving image
 To do:
 3rd October 2022
 - [x] Get one architecture working, as in fitting, and saving 
+- [ ] parameterised the feature input dimensions, and pass this to the onnx
+  exporter class during training
 - [ ] Review https://pytorch.org/audio/stable/_modules/torchaudio/models/wav2vec2/model.html#Wav2Vec2Model, test exporting the feature extractor of huggingface as part of the model architecture
 - [ ] Normalisation approach: apply PCEN https://github.com/daemon/pytorch-pcen
 - [x] change the output of networks to be logits let Routine function handle 
