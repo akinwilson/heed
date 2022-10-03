@@ -8,9 +8,14 @@ From the directory level of this README.md file. The build context needs access 
 This will build the docker images
 
 Run:
-`docker build . -f torch-deploy/Dockerfile.tensorrt -t serve:latest` 
-To deploy the TensorRT serving image
+`docker build . -f torch-deploy/Dockerfile.tensorrt -t serve:latest`
+To Build the image locally 
 
+Running the image iteractively 
+`docker run --gpus all -p 8080:8080 -it serve:latest /bin/bash`
+**Note** This will require Nvidia docker. You will enter the container at `/workspace`. 
+
+Enter the command: `../app && python main.py` to start the server`
 To do:
 3rd October 2022
 - [x] Get one architecture working, as in fitting, and saving 
