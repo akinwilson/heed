@@ -58,9 +58,9 @@ async def startup_event():
     # use cpu
     providers = ['CPUExecutionProvider',]
     # use TensorRT
-    providers = ['TensorrtExecutionProvider',]
+    # providers = ['TensorrtExecutionProvider',]
     # get executioner from envirnoment
-    providers = [os.environ.get("EXECUTION_PROVIDER")]
+    providers = [os.environ.get("EXECUTION_PROVIDER"),]
     
 
     inference_session = onnxruntime.InferenceSession(CONFIG['ONNX_MODEL_PATH'],
