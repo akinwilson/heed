@@ -44,9 +44,8 @@ async def startup_event():
     """
     logger.info(f"Running envirnoment: {CONFIG['ENV']}")
     logger.info(f"PyTorch using device: {CONFIG['DEVICE']}")
+    # use  GPU
     providers = [
-        'TensorrtExecutionProvider',
-        'CPUExecutionProvider',
         ('CUDAExecutionProvider', {
             'device_id': 0,
             'arena_extend_strategy': 'kNextPowerOfTwo',
@@ -58,17 +57,11 @@ async def startup_event():
     ]
     # use cpu
     providers = ['CPUExecutionProvider',]
-    # # use cuda 
-    # providers = [ ('CUDAExecutionProvider', {
-    #         'device_id': 0,
-    #         'arena_extend_strategy': 'kNextPowerOfTwo',
-    #         'gpu_mem_limit': 2 * 1024 * 1024 * 1024,
-    #         'cudnn_conv_algo_search': 'EXHAUSTIVE',
-    #         'do_copy_in_default_stream': True,
-    #                             }
-    #     )]
     # use TensorRT
     providers = ['TensorrtExecutionProvider',]
+    # get executioner from envirnoment
+    providers = [os.environ.get("EXECUTION_PROVIDER")]
+    
 
     inference_session = onnxruntime.InferenceSession(CONFIG['ONNX_MODEL_PATH'],
                                                      providers=providers)
