@@ -122,7 +122,7 @@ class ResNet(nn.Module):
         out = self.layer3(out)
         out = self.layer4(out)
         out = F.avg_pool2d(out, 2)
-        # flatten operation
+        # equivalent to flatten operation
         out = out.view(out.size(0), -1)
         out = self.dropout(out)
         out = self.linear(out)
@@ -362,3 +362,6 @@ class Architecture(nn.Module):
             logger.info(f"Architecture().forward(x)  model() [out]: {logits.shape}")
 
         return logits  
+##################################################################################################################################
+#  Old style init architectue 
+##################################################################################################################################
