@@ -43,7 +43,7 @@ To start the server. Obviously you can start the server with single command
 Go to http://0.0.0.0:8080/docs to test out the enpoint via the swagger UI. 
 
 To do:
-3rd October 2022
+4th October 2022
 - [x] Get one architecture working, as in fitting, and saving 
 - [ ] parameterised the feature input dimensions, and pass this to the onnx
   exporter class during training
