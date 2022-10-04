@@ -44,22 +44,7 @@ async def startup_event():
     """
     logger.info(f"Running envirnoment: {CONFIG['ENV']}")
     logger.info(f"PyTorch using device: {CONFIG['DEVICE']}")
-    # use  GPU
-    providers = [
-        ('CUDAExecutionProvider', {
-            'device_id': 0,
-            'arena_extend_strategy': 'kNextPowerOfTwo',
-            'gpu_mem_limit': 2 * 1024 * 1024 * 1024,
-            'cudnn_conv_algo_search': 'EXHAUSTIVE',
-            'do_copy_in_default_stream': True,
-                                }
-        )
-    ]
-    # use cpu
-    providers = ['CPUExecutionProvider',]
-    # use TensorRT
-    # providers = ['TensorrtExecutionProvider',]
-    # get executioner from envirnoment
+
     providers = [os.environ.get("EXECUTION_PROVIDER"),]
     
 
