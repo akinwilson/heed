@@ -75,7 +75,7 @@ def do_predict(request: Request, body: InferenceInput):
     ################################################################
     # from base64str to array
     s = time.time()
-    decoded_wav = base64.decodebytes(body.base64str)
+    decoded_wav = base64.decodebytes(body.content)
     x = np.frombuffer(decoded_wav, dtype=np.int16)
     # (sample_len,)
     x = x[np.newaxis, ...]    
