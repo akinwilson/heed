@@ -12,7 +12,7 @@ class InferenceInput(BaseModel):
     """
     Input values for model inference
     """
-    base64str: Optional[bytes] = Field(..., example=BASE64, title='Base64 encoded PCM waveform')
+    content: Optional[bytes] = Field(..., example=BASE64, title='Base64 encoded PCM waveform')
 
 
 
