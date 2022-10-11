@@ -46,7 +46,7 @@ async def startup_event():
     logger.info(f"PyTorch using device: {CONFIG['DEVICE']}")
 
     providers = [os.environ.get("EXECUTION_PROVIDER"),]
-    
+    # providers = ["CPUExecutionProvider",]
 
     inference_session = onnxruntime.InferenceSession(CONFIG['ONNX_MODEL_PATH'],
                                                      providers=providers)
@@ -59,7 +59,7 @@ async def startup_event():
 
 
 @app.post('/api/v1/predict',
-          response_model=InferenceResponse,
+          response_model=InferenceResult,
           responses={422: {"model": ErrorResponse},
                      500: {"model": ErrorResponse}}
           )
@@ -106,8 +106,6 @@ def do_predict(request: Request, body: InferenceInput):
     ww_prob = result[0][0][0]
     # prepare json for returning
     return {
-        "error": False,
-        "result": {
             "wake_word_probability": ww_prob , 
             "prediction": 1.0 if ww_prob > CONFIG['DECISION_THRESHOLD'] else 0.0, 
             "false_alarm_probability": 1-ww_prob,
@@ -115,7 +113,6 @@ def do_predict(request: Request, body: InferenceInput):
             "wwvm_version" : CONFIG['MODEL_VERSION'],
             "inference_time" : f-s 
             }
-    }
 
 
 @app.get('/about')
