@@ -64,7 +64,9 @@ class Config:
         self.fit_param = params['fit_param']
         self.data_param = params['data_param']
         self.path = params['path']
-        self.verbose = params['verbose']# True 
+        self.verbose = params['verbose']# True
+        self.lr_scheduler_epoch = [100,200,300]
+        self.lr_rates = [0.02, 0.05, 0.1] 
 
     @property
     def max_sample_len(self):

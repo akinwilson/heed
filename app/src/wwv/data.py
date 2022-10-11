@@ -75,6 +75,7 @@ class AudioDataset(Dataset):
         #              Need to parameterised this
         ##########################################################
         self.x_mfcc = torchaudio.transforms.MFCC(melkwargs=kwargs)
+        self.x_melspec = torchaudio.transforms.MelSpectrogram()
         ##########################################################
         self.cfg = cfg
 
@@ -94,7 +95,12 @@ class AudioDataset(Dataset):
         ##########################################################
         x = self.x_scale(x)
         x = self.x_pad(x)
-        x = self.x_mfcc(x)
+        if self.cfg.audio_feature == "mfcc":
+            x = self.x_mfcc(x)
+        elif self.cfg.audio_feature == "spectrogram":
+             x = self.x_melspec(x).transpose(1,2)
+        else:
+            x = x
         ##########################################################
         return x,y
 
