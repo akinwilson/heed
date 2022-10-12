@@ -70,6 +70,7 @@ def do_predict(request: Request, body: InferenceInput):
 
     logger.info('API predict called')
     logger.info(f'input: {body}')
+    MAX_INPUT_DIM = 48000
     ################################################################
     #                   preprocess before onnx
     ################################################################
@@ -80,8 +81,14 @@ def do_predict(request: Request, body: InferenceInput):
     # (sample_len,)
     x = x[np.newaxis, ...]    
     # (channel_dim, sample_len)
-    pad_up = 48000 - x.shape[-1] 
-    X = np.pad(x, ((0,0), (0, pad_up)), 'constant')
+    pad_up = MAX_INPUT_DIM - x.shape[-1] 
+    if pad_up < 0:
+        # Truncating case
+        X = x[...,: MAX_INPUT_DIM]
+    else:
+        # Padding case 
+        X = np.pad(x, ((0,0), (0, pad_up)), 'constant')
+
     X = X[np.newaxis, ...]
     # (batch_dim, channel_dim, sample_len)    
     X  = X / np.iinfo(np.int16).max # normalise to range -1 to 1
