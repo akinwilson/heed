@@ -20,18 +20,18 @@ If you dont have relevant .csv files pulled via DVC, please just run the `/noteb
 
 ### Getting a model 
 
-At the moment, the easiest way for you to get a model.onnx file to test the endpoint is via running the first couple of cells of `/notebooks/arch-testing.ipynb`. You will have a directory produces called `/output` in the root directory of the repository. In there you will find the `model.onnx` that is needed to be placed into the `/torch-deploy/model` directory, for the deployment to work. 
+At the moment, the easiest way for you to get a model.onnx file to test the endpoint is via running the first couple of cells of `/notebooks/arch-testing.ipynb`. You will have a directory produces called `/output` in the root directory of the repository. In there you will find the `model.onnx` that is needed to be placed into the `/deploy/model` directory, for the deployment to work. 
 
 
 ### Building deployment container
 
 To Build the image locally run:
-`docker build . -f torch-deploy/Dockerfile.tensorrt -t serve:latest`
+`docker build . -f deploy/Dockerfile.tensorrt -t serve:latest`
 
 To deploy the image and test the endpoint, run:
  `docker run --gpus all -p 8080:80 -e "WORKERS=1" -e "EXECUTION_PROVIDER=TensorrtExecutionProvider"  --name="rt_test" -it serve:latest`
  <br><br>
-**Note** You will need to move a `model.onnx` into the `/torch-deploy/model` directory if you wish to deploy a model. 
+**Note** You will need to move a `model.onnx` into the `/deploy/model` directory if you wish to deploy a model. 
 
 Running the image iteractively 
 `docker run --gpus all -p 8080:8080 -it serve:latest /bin/bash`
