@@ -72,7 +72,7 @@ def do_predict(request: Request, body: InferenceInput):
     logger.info(f'input: {body}')
     MAX_INPUT_DIM = 48000
     ################################################################
-    #                   preprocess before onnx
+    #                   Preprocess before onnx
     ################################################################
     # from base64str to array
     s = time.time()
