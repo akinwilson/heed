@@ -9,6 +9,7 @@ src/wwv/config.py
 src/wwv/data.py
 src/wwv/eval.py
 src/wwv/layer.py
+src/wwv/meta.py
 src/wwv/old_train.py
 src/wwv/plot.py
 src/wwv/train.py
