@@ -47,17 +47,17 @@ RUN export LD_LIBRARY_PATH=$PWD:$LD_LIBRARY_PATH
 
 WORKDIR /workspace
 
-COPY ./torch-deploy/requirements.txt .
+COPY ./deploy/requirements.txt .
 RUN pip3 --timeout=300 --no-cache-dir install -r requirements.txt
 
 # Copy model files
-COPY ./torch-deploy/model /model
+COPY ./deploy/model /model
 RUN pip3 --timeout=300 --no-cache-dir install -r requirements.txt
 # Copy app files
-COPY ./torch-deploy/app /app
+COPY ./deploy/app /app
 
 
-COPY ./torch-deploy/start.sh /app/start.sh
+COPY ./deploy/start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
 WORKDIR /app
