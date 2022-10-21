@@ -7,7 +7,7 @@ logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler())
 
 class Metric:
-    def __init__(self, y_hat, y, cfg):
+    def __init__(self, y_hat, y):
         """
         y_hat and y are expected to be lists.
 
@@ -28,10 +28,11 @@ class Metric:
 
         self.y_hat = y_hat #  torch.squeeze(torch.tensor(y_hat))
         self.y = y #  torch.squeeze(torch.tensor(y))
-        self.cfg = cfg 
+
+        # self.cfg = cfg 
         # if cfg.verbose:
-        #     logger.info(f"Metric().__init__  y_hat: {self.y_hat.shape}")
-        #     logger.info(f"Metric().__init__ y: {self.y.shape}")
+        # logger.info(f"Metric().__init__  y_hat: {self.y_hat.shape}")
+        # logger.info(f"Metric().__init__ y: {self.y.shape}")
 
         self.tp = 0
         self.tn = 0 

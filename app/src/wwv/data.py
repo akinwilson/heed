@@ -22,15 +22,25 @@ class DataCollator:
         x = [ x for (x,_) in batch ]
         y = [ y for (_,y) in batch ]
 
-        x_batched = torch.stack(x).float() 
-        # x_batched.squeeze_(dim=1) # removing audio channel dim
+        x_batched = torch.stack(x).float()
+        if self.cfg.model_name == "HSTAT":
+            x_batched.squeeze_(dim=1) # removing audio channel dim
+
         y_batched = torch.stack(y).float()
         if self.cfg.verbose:
             logger.info(f"DataCollator().__call__ x_batched [out]: {x_batched.shape}")
             logger.info(f"DataCollator().__call__ y_batched [out]: {y_batched.shape}")
         # return dictionary for unpacking easily as args 
 
-        return {
+        if self.cfg.model_name == "HSTAT":
+            return {
+                "target": y_batched.long(),
+                "waveform": x_batched,
+                "real_len": torch.cat([torch.tensor([self.cfg.max_sample_len]) for _ in range(self.cfg.data_param['train_batch_size'])])
+            }
+
+        else:    
+            return {
             "x": x_batched,
             "y": y_batched
             }
