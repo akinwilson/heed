@@ -6,9 +6,59 @@ import numpy as np
 import json
 import os
 from dataclasses import asdict, dataclass, field
+from typing import Tuple,List
 from pathlib import Path 
 
 
+@dataclass 
+class HTSwin:
+    #for htSwin hyperparamater
+    window_size: int = 8
+    spec_size: int =  256
+    patch_size: int = 4 
+    stride: Tuple[int] = (2, 2)
+    num_head: List = field(default_factory= lambda : [4,8,16,32])
+    dim: int = 192
+    num_classes: int = 2
+    depth: List = field(default_factory= lambda : [2,2,6,2])
+
+
+@dataclass
+class Signal:
+    # for signal processing
+    sample_rate : int = 16000
+    audio_duration : int = 3
+    clip_samples : int = int(sample_rate * audio_duration)
+    window_size : int = 1024
+    hop_size  : int= 160
+    mel_bins : int = 64
+    fmin : int = 50
+    fmax : int = 14000
+    shift_max : int = int(clip_samples * 0.5)
+    enable_tscam : bool = field(default=True, metadata= { "help":  "Enbale the token-semantic layer"})
+
+
+@dataclass 
+class Fitting:
+   # random_seed: int  = 970131
+    batch_size: int  = 16
+    learning_rate: float = 1e-3 
+    max_epoch : int = 500
+    num_workers : int  = 18
+    lr_scheduler_epoch : List  =  field(default_factory=  lambda : [10,20,30])
+    lr_rate : List = field(default_factory = lambda :  [0.02, 0.05, 0.1])
+    es_patience: int = 25
+    train_bs : int = 16 
+    val_bs : int  = 16
+    test_bs : int = 16
+
+# "fit_param": {"init_lr":LR_RANGE, "weight_decay":0.0001, "max_epochs":EPOCH_RANGE, "gamma": 0.1,"es_patience":ES_PATIENCE_RANGE}, 
+#     "data_param":{"train_batch_size": BATCH_SIZE_RANGE, "val_batch_size": BATCH_SIZE_RANGE,"test_batch_size": BATCH_SIZE_RANGE}, 
+
+@dataclass
+class ResNet:
+    num_blocks: List = field( default_factory = lambda : [8, 8, 36, 3] )
+    
 
 @dataclass
 class DataPaths:
