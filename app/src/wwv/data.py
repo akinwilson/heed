@@ -23,8 +23,11 @@ class DataCollator:
         y = [ y for (_,y) in batch ]
 
         x_batched = torch.stack(x).float()
+
+        ####################################################################################################################################
         if self.cfg.model_name == "HSTAT":
             x_batched.squeeze_(dim=1) # removing audio channel dim
+        ####################################################################################################################################
 
         y_batched = torch.stack(y).float()
         if self.cfg.verbose:
@@ -32,13 +35,14 @@ class DataCollator:
             logger.info(f"DataCollator().__call__ y_batched [out]: {y_batched.shape}")
         # return dictionary for unpacking easily as args 
 
+        ####################################################################################################################################
         if self.cfg.model_name == "HSTAT":
             return {
                 "target": y_batched.long(),
                 "waveform": x_batched,
                 "real_len": torch.cat([torch.tensor([self.cfg.max_sample_len]) for _ in range(self.cfg.data_param['train_batch_size'])])
             }
-
+        ####################################################################################################################################
         else:    
             return {
             "x": x_batched,
@@ -116,13 +120,14 @@ class AudioDataset(Dataset):
 
 
 class AudioDataModule():  # pl.LightningDataModule):
-    def __init__(self,train_df_path, val_df_path, test_df_path,cfg):
+    def __init__(self,train_df_path, val_df_path, test_df_path, cfg, cfg_fitting):
         super().__init__()
 
         self.train_df_path = train_df_path
         self.val_df_path =  val_df_path
         self.test_df_path =  test_df_path
         self.cfg = cfg 
+        self.cfg_fitting = cfg_fitting
         self.pin_memory =  False # True if torch.cuda.is_available() else False 
         
 
@@ -130,7 +135,7 @@ class AudioDataModule():  # pl.LightningDataModule):
     def train_dataloader(self):
         ds_train = AudioDataset(df_path=self.train_df_path,cfg=self.cfg ) # apply_augmentation)
         return DataLoader(ds_train,
-                          batch_size=self.cfg.data_param['train_batch_size'],
+                          batch_size=self.cfg_fitting.train_bs,
                           shuffle=True,
                           drop_last=True,
                           pin_memory= self.pin_memory,
@@ -141,7 +146,7 @@ class AudioDataModule():  # pl.LightningDataModule):
     def val_dataloader(self):
         ds_val = AudioDataset(df_path=self.val_df_path, cfg=self.cfg)
         return  DataLoader(ds_val,
-                          batch_size=self.cfg.data_param['val_batch_size'],
+                          batch_size=self.cfg_fitting.val_bs,
                           shuffle=True,
                           drop_last=True,
                           pin_memory= self.pin_memory,
@@ -151,84 +156,11 @@ class AudioDataModule():  # pl.LightningDataModule):
     def test_dataloader(self):
         ds_test = AudioDataset(df_path=self.test_df_path,cfg=self.cfg)
         return  DataLoader(ds_test,
-                          batch_size=self.cfg.data_param['test_batch_size'],
+                          batch_size=self.cfg_fitting.test_bs,
                           shuffle=True,
                           drop_last=True,
                           pin_memory= self.pin_memory,
                           collate_fn= DataCollator(self.cfg))
-
-
-
-
-##############################################################################################################
-# Way to provide metadata 
-# for config file 
-# unused 
-##############################################################################################################
-
-from pydantic import validate_arguments
-from dataclasses import dataclass, field
-# from typing import Dict, List, Optional
-
-
-### Data class for hyperparameters. I use pydantic to make sure the typs are enforced and checked before being passed to the trainer. 
-@validate_arguments
-@dataclass
-class Hyperparameters:
-    beta_min: float = field(
-        metadata={
-            "help": "Adam Optimizer lower bound hyperparameter on coefficients used for computing running averages of gradient and its square"
-        }
-    )
-
-    beta_max: float = field(
-        metadata={
-            "help": "Adam optimizer upper bound hyperparameter on coefficients used for computing running averages of gradient and its square"
-        }
-    )
-    eps: float = field(
-        metadata={
-            "help": "Term added to the denominator to improve numerical stability"
-        }
-    )
-    lr: float = field(
-        metadata={
-            "help": "Optmizer's learning rate (initial)"
-        }
-    ) 
-    weight_decay: float = field(
-        metadata={
-            "help": "Optmizer's weight decay (L2 penalty)"
-        }
-    ) 
-    
-    hidden_dim: int = field(
-        metadata={
-            "help": "architectural parameter; hidden dimension width"
-        }
-    ) 
-    batch_size: int = field(
-        metadata={
-            "help": "training routine parameter; batch size for parallel processing"
-        }
-    ) 
-    max_epochs: int = field(
-        metadata={
-            "help": "training routine parameter; maximum epochs"
-        }
-    ) 
-    num_classes: int = field(
-        metadata={
-            "help": "Training data parameter; number of target classes, needed by the F1 metric calculation"
-        }
-    ) 
-        
-        
-
-
-
-
-
 
 
 
