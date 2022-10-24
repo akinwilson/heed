@@ -11,26 +11,32 @@ from pathlib import Path
 
 
 @dataclass 
-class HTSwin:
-    #for htSwin hyperparamater
+class HTSwinCfg:
+    '''for htSwin hyperparamater'''
     window_size: int = 8
     spec_size: int =  256
     patch_size: int = 4 
     stride: Tuple[int] = (2, 2)
     num_head: List = field(default_factory= lambda : [4,8,16,32])
-    dim: int = 192
+    dim: int = 96
     num_classes: int = 2
-    depth: List = field(default_factory= lambda : [2,2,6,2])
+    depth: List = field(default_factory= lambda : [2,6,6,4])
 
 
 @dataclass
-class Signal:
-    # for signal processing
+class ResNetCfg:
+    '''Residual network architectural parameters'''
+    num_blocks: List = field( default_factory = lambda : [8, 8, 36, 3] )
+    
+
+@dataclass
+class SignalCfg:
+    ''' Parameters for signal processing of HTSwin '''
     sample_rate : int = 16000
-    audio_duration : int = 3
+    audio_duration : int = 2
     clip_samples : int = int(sample_rate * audio_duration)
-    window_size : int = 1024
-    hop_size  : int= 160
+    window_size : int = 512
+    hop_size  : int= 256
     mel_bins : int = 64
     fmin : int = 50
     fmax : int = 14000
@@ -39,8 +45,7 @@ class Signal:
 
 
 @dataclass 
-class Fitting:
-   # random_seed: int  = 970131
+class FittingCfg:
     batch_size: int  = 16
     learning_rate: float = 1e-3 
     max_epoch : int = 500
@@ -52,16 +57,10 @@ class Fitting:
     val_bs : int  = 16
     test_bs : int = 16
 
-# "fit_param": {"init_lr":LR_RANGE, "weight_decay":0.0001, "max_epochs":EPOCH_RANGE, "gamma": 0.1,"es_patience":ES_PATIENCE_RANGE}, 
-#     "data_param":{"train_batch_size": BATCH_SIZE_RANGE, "val_batch_size": BATCH_SIZE_RANGE,"test_batch_size": BATCH_SIZE_RANGE}, 
+
 
 @dataclass
-class ResNet:
-    num_blocks: List = field( default_factory = lambda : [8, 8, 36, 3] )
-    
-
-@dataclass
-class DataPaths:
+class DataPathCfg:
     root_data_dir : str  = field(
         metadata={
             "help": "Root directory of training, validation and testing csv files"
@@ -128,6 +127,7 @@ class Config:
         if self.audio_feature == "mfcc":
             n_mfcc =  getattr(self,attrname)[self.audio_feature]['n_mfcc']
             hop_len = getattr(self,attrname)[self.audio_feature]['hop_length']
+
             time_step = int(np.around(self.max_sample_len / hop_len, 0))
             return  (n_mfcc, time_step)
         if self.audio_feature == "spectrogram":
@@ -138,3 +138,6 @@ class Config:
         if self.audio_feature == "pcm":
             return self.max_sample_len
 
+
+
+# 75 *  0.02 / 16000 = a 
