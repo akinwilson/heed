@@ -14,7 +14,7 @@ logger.addHandler(logging.StreamHandler())
 
 
 from wwv.data import AudioDataModule
-from wwv.architecture import Architecture
+from wwv.Architecture import Architecture
 from wwv.layer import AugmentationManager
 from wwv.eval import Metric
 from wwv.plot import Plotter

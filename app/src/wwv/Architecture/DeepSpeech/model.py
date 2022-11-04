@@ -25,7 +25,9 @@ class DeepSpeech(nn.Module):
             x = self.fc2(x)
             x = self.fc3(x)
             x, _ = self.bi_rnn(x)
-            x = x[:, :self.n_hidden] + x[:, self.n_hidden :]
+            x_forward = x[:, :self.n_hidden] 
+            x_backward = x[:, self.n_hidden :]
+            x = x_forward + x_backward
             x = self.fc4(x)
             x = self.out(x)
             x = torch.squeeze(x, dim=-1)

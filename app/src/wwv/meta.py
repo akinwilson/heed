@@ -2,11 +2,11 @@
 MODEL_DIR = "/home/akinwilson/Code/pytorch/output/model"  # location of root outputs
 DATA_DIR = "/home/akinwilson/Code/pytorch/dataset/keywords" # root location of meta training data csv files 
 LR_RANGE = [1e-1, 1e-2, 1e-3, 1e-4, 1e-5][1] 
-BATCH_SIZE_RANGE = [1,2,32, 64, 128, 256][2]
+BATCH_SIZE_RANGE = [1,2,16, 32, 64, 128, 256][2]
 EPOCH_RANGE = [1, 10, 30, 50, 100, 1000][1]
-ES_PATIENCE_RANGE = [1, 10, 20, 100, 200][2]
-MODELS = ["VecM5", "Resnet2vec1D","SpecResnet2D", "HSTAT", "DeepSpeech", "ResNet"][-3]
-AUDIO_FEATURE_OPT = ["spectrogram", "mfcc", "pcm"][-1]
+ES_PATIENCE_RANGE = [1, 10, 20, 100, 200][1]
+MODELS = ["VecM5", "Resnet2vec1D","SpecResnet2D", "HSTAT", "DeepSpeech", "ResNet"][-1]
+AUDIO_FEATURE_OPT = ["spectrogram", "mfcc", "pcm"][1]
 PRETRAINED_MODEL_NAME_OR_PATH = "facebook/wav2vec2-base-960h"
 AUGS = False
 
