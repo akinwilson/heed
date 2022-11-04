@@ -14,3 +14,4 @@ https://download.pytorch.org/whl/nightly/
 onnxruntime-gpu
 onnx
 latex
+torchlibrosa
