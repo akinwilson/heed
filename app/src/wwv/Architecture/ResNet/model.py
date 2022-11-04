@@ -15,6 +15,7 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, num_blocks[2], stride=2)
         self.layer4 = self._make_layer(block, 512, num_blocks[3], stride=2)
         self.dropout = nn.Dropout(p=dropout)
+        # need to parameterised. Given input size, I know what the linear's layers row dim should be
         self.linear = nn.Linear(20480, num_classes)
 
     def _make_layer(self, block, planes, num_blocks, stride):
