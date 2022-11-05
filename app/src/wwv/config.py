@@ -1,6 +1,9 @@
 '''
 Processing, training, data, model and augmentation configuration 
 definition
+
+Have created model dataclasses to tried to isolated factors of concerns on per model basis 
+Note, there is overlap in attributes at the moment amongst the data classes. 
 '''
 import numpy as np 
 import json
@@ -11,6 +14,14 @@ from collections import defaultdict
 from pathlib import Path 
 
 
+@dataclass
+class ResNet:
+    '''Residual network architectural parameters'''
+    num_blocks: List = field( default_factory = lambda : [4, 6, 18, 3] )
+    audio_feature: str = "mfcc" 
+    model_name: str = "ResNet"
+    model_dir: str =  "/home/akinwilson/Code/pytorch/output/model"
+    max_sample_len : int = 32000 
 
 @dataclass 
 class HTSwin:
@@ -60,14 +71,9 @@ class Signal:
     enable_tscam : bool = field(default=True, metadata= { "help":  "Enbale the token-semantic layer"})
     
 
-@dataclass
-class ResNet:
-    '''Residual network architectural parameters'''
-    num_blocks: List = field( default_factory = lambda : [4, 6, 18, 3] )
-    audio_feature: str = "mfcc" 
-    model_name: str = "ResNet"
 
-    
+
+
 @dataclass
 class Feature:
 
