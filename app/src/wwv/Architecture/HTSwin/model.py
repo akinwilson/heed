@@ -37,6 +37,7 @@ def interpolate(x, ratio):
     upsampled = upsampled.reshape(batch_size, time_steps * ratio, classes_num)
     return upsampled
 
+
 # below code based on https://github.com/microsoft/Swin-Transformer
 # Research paper https://arxiv.org/pdf/2103.14030.pdf
 
@@ -389,6 +390,7 @@ class BasicLayer(nn.Module):
         return f"dim={self.dim}, input_resolution={self.input_resolution}, depth={self.depth}"
 
 
+# The Core of HTSwinTransformer
 class HTSwinTransformer(nn.Module):
     r"""HTSAT based on the Swin Transformer
     Args:
@@ -496,15 +498,22 @@ class HTSwinTransformer(nn.Module):
                                                  top_db=top_db, 
                                                 freeze_parameters=True)
         # Spec augmenter
-        self.spec_augmenter = SpecAugmentation(time_drop_width=64, time_stripes_num=2, 
-            freq_drop_width=8, freq_stripes_num=2) # 2 2
+        self.spec_augmenter = SpecAugmentation(time_drop_width=64,
+                                                time_stripes_num=2, 
+                                                freq_drop_width=8,
+                                                freq_stripes_num=2) # 2 2
+
         self.bn0 = nn.BatchNorm2d(self.cfg_signal.mel_bins)
 
-
+        
         # split spctrogram into non-overlapping patches
-        self.patch_embed = PatchEmbed(
-            img_size=self.spec_size, patch_size=self.patch_size, in_chans=self.in_chans, 
-            embed_dim=self.embed_dim, norm_layer=self.norm_layer, patch_stride = patch_stride)
+        self.patch_embed = PatchEmbed(img_size=self.spec_size,
+                                      patch_size=self.patch_size,
+                                      in_chans=self.in_chans,
+                                      embed_dim=self.embed_dim,
+                                      norm_layer=self.norm_layer,
+                                      patch_stride = patch_stride)
+
 
         num_patches = self.patch_embed.num_patches
         patches_resolution = self.patch_embed.grid_size
@@ -554,9 +563,14 @@ class HTSwinTransformer(nn.Module):
             )
             self.head = nn.Linear(num_classes, num_classes)
         else:
-            self.head = nn.Linear(self.num_features, num_classes) if num_classes > 0 else nn.Identity()
+            self.head = nn.Linear(self.num_features, num_classes)
+            
+        self.classifier = nn.Linear(self.num_features, num_classes)
+
 
         self.apply(self._init_weights)
+
+
 
     def _init_weights(self, m):
         if isinstance(m, nn.Linear):
@@ -567,25 +581,25 @@ class HTSwinTransformer(nn.Module):
             nn.init.constant_(m.bias, 0)
             nn.init.constant_(m.weight, 1.0)
 
-    @torch.jit.ignore
-    def no_weight_decay(self):
-        return {'absolute_pos_embed'}
 
-    @torch.jit.ignore
-    def no_weight_decay_keywords(self):
-        return {'relative_position_bias_table'}
 
 
     def forward_features(self, x):
 
-        frames_num = x.shape[2]        
+        frames_num = x.shape[2]
+
         x = self.patch_embed(x)
+
         if self.ape:
             x = x + self.absolute_pos_embed
+
         x = self.pos_drop(x)
         for i, layer in enumerate(self.layers):
             x, attn = layer(x)
+        
 
+
+        # no issue passing
         if self.cfg_signal.enable_tscam:
             # for x
             x = self.norm(x)
@@ -609,41 +623,61 @@ class HTSwinTransformer(nn.Module):
             
             x = self.avgpool(x)
             x = torch.flatten(x, 1)
-
-            # if self.config.loss_type == "clip_ce":
             output_dict = {
                 'framewise_output': fpx, # already sigmoided
                 'clipwise_output': x,
                 'latent_output': latent_output
             }
-            # else:
-            #     output_dict = {
-            #         'framewise_output': fpx, # already sigmoided
-            #         'clipwise_output': torch.sigmoid(x),
-            #         'latent_output': latent_output
-            #     }
-           
+##########################################################################################
+##########################################################################################
+        # issue with model: 
+        #      - set self.cfg_signal.enable_tscam = False to see
+##########################################################################################
+##########################################################################################
         else:
             x = self.norm(x)  # B N C
             B, N, C = x.shape
             
-            fpx = x.permute(0,2,1).contiguous().reshape(B, C, frames_num // (2 ** (len(self.depths) + 1)), frames_num // (2 ** (len(self.depths) + 1)) )
+            fpx = (x.permute(0,2,1)
+                    .contiguous()
+                    .reshape( B,
+                              C,
+                              frames_num // (2 ** (len(self.depths) + 1)),
+                              frames_num // (2 ** (len(self.depths) + 1)) ))
+
             B, C, F, T = fpx.shape
             c_freq_bin = F // self.freq_ratio
+
             fpx = fpx.reshape(B, C, F // c_freq_bin, c_freq_bin, T)
             fpx = fpx.permute(0,1,3,2,4).contiguous().reshape(B, C, c_freq_bin, -1)
+
             fpx = torch.sum(fpx, dim = 2)
             fpx = interpolate(fpx.permute(0,2,1).contiguous(), 8 * self.patch_stride[1]) 
+
             x = self.avgpool(x.transpose(1, 2))  # B C 1
+
+            bs = x.shape[0]
+            x_view = x.view(bs, -1)
+
             x = torch.flatten(x, 1)
-            if self.num_classes > 0:
-                x = self.head(x)
-                fpx = self.head(fpx)
-            output_dict = {
-                'framewise_output': torch.sigmoid(fpx), 
-                'clipwise_output': torch.sigmoid(x)
-                }
+
+            assert x_view == x , "Reranging tensor view flatten and view not equalivalent"
+
+
+            # if self.num_classes > 0:
+            # print("hit forward_features not")
+            x = self.head(x)
+            fpx = self.head(fpx)
+            # output_dict = {
+            #     'framewise_output': torch.sigmoid(fpx), 
+            #     'clipwise_output': torch.sigmoid(x)
+            #     }
+
+            output_dict = {'framewise_output':fpx, 'clipwise_output': x}
+
         return output_dict
+##########################################################################################
+##########################################################################################
 
     def crop_wav(self, x, crop_size, spe_pos = None):
         time_steps = x.shape[2]
@@ -655,6 +689,7 @@ class HTSwinTransformer(nn.Module):
                 crop_pos = spe_pos
             tx[i][0] = x[i, 0, crop_pos:crop_pos + crop_size,:]
         return tx
+
 
     # Reshape the wavform to a img size, if you want to use the pretrained swin transformer model
     def reshape_wav2img(self, x):
@@ -673,27 +708,14 @@ class HTSwinTransformer(nn.Module):
         x = x.permute(0,1,3,2,4).contiguous()
         x = x.reshape(x.shape[0], x.shape[1], x.shape[2] * x.shape[3], x.shape[4])
         return x
-    
-    # Repeat the wavform to a img size, if you want to use the pretrained swin transformer model
-    def repeat_wat2img(self, x, cur_pos):
-        B, C, T, F = x.shape
-        target_T = int(self.spec_size * self.freq_ratio)
-        target_F = self.spec_size // self.freq_ratio
-        assert T <= target_T and F <= target_F, "the wav size should less than or equal to the swin input size"
-        # to avoid bicubic zero error
-        if T < target_T:
-            x = nn.functional.interpolate(x, (target_T, x.shape[3]), mode="bicubic", align_corners=True)
-        if F < target_F:
-            x = nn.functional.interpolate(x, (x.shape[2], target_F), mode="bicubic", align_corners=True)  
-        x = x.permute(0,1,3,2).contiguous() # B C F T
-        x = x[:,:,:,cur_pos:cur_pos + self.spec_size]
-        x = x.repeat(repeats = (1,1,4,1))
-        return x
+
+
 
     def forward(self, x: torch.Tensor, mixup_lambda = None, infer_mode = False):# out_feat_keys: List[str] = None):
+        x.squeeze_(1)
+        # (bs, feature)
         x = self.spectrogram_extractor(x)   # (batch_size, 1, time_steps, freq_bins)
         x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
-        
         
         x = x.transpose(1, 3)
         x = self.bn0(x)
@@ -714,6 +736,7 @@ class HTSwinTransformer(nn.Module):
 
         else:
             if x.shape[2] > self.freq_ratio * self.spec_size:
+                #  ( spec_size // mel_bins )* spec_size
                 if self.training:
                     x = self.crop_wav(x, crop_size=self.freq_ratio * self.spec_size)
                     x = self.reshape_wav2img(x)
@@ -732,8 +755,7 @@ class HTSwinTransformer(nn.Module):
                     for d in output_dicts:
                         clipwise_output += d["clipwise_output"]
                         framewise_output += d["framewise_output"]
-                    clipwise_output  = clipwise_output / len(output_dicts)
-                    framewise_output = framewise_output / len(output_dicts)
+
                     output_dict = {
                         'framewise_output': framewise_output, 
                         'clipwise_output': clipwise_output
@@ -741,5 +763,6 @@ class HTSwinTransformer(nn.Module):
             else: # this part is typically used, and most easy one
                 x = self.reshape_wav2img(x)
                 output_dict = self.forward_features(x)
-        # x = self.head(x)
-        return output_dict
+
+        logits = self.classifier(output_dict['clipwise_output'])
+        return logits
