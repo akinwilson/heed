@@ -94,8 +94,8 @@ class Fitting:
     num_workers : int  = 18
     lr_scheduler_epoch : List  =  field(default_factory=  lambda : [10,20,30])
     lr_rate : List = field(default_factory = lambda :  [0.02, 0.05, 0.1])
-    es_patience: int = 25
-
+    es_patience: int = 8
+    
     train_bs : int = 32
     val_bs : int  = 32
     test_bs : int = 32

@@ -7,6 +7,8 @@ import torchaudio
 import logging
 
 from wwv.layer import Scaler
+import copy 
+
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -34,16 +36,6 @@ class DataCollator:
         #     logger.info(f"DataCollator().__call__ x_batched [out]: {x_batched.shape}")
         #     logger.info(f"DataCollator().__call__ y_batched [out]: {y_batched.shape}")
         # return dictionary for unpacking easily as args 
-
-        ####################################################################################################################################
-        # if self.cfg.model_name == "HSTAT":
-        #     return {
-        #         "target": y_batched.long(),
-        #         "waveform": x_batched,
-        #         "real_len": torch.cat([torch.tensor([self.cfg.max_sample_len]) for _ in range(self.cfg.data_param['train_batch_size'])])
-        #     }
-        # ####################################################################################################################################
-        # else:    
         return {
         "x": x_batched,
         "y": y_batched
@@ -78,18 +70,11 @@ class AudioDataset(Dataset):
 
         self.x_pad = Padder(cfg_model)
         self.x_scale = Scaler()
-        ##########################################################
-        #              Need to parameterised this
-        ##########################################################
         kwargs = {"window_fn": torch.hann_window,"wkwargs":{"device": device}}
         melkwargs = {**kwargs, **cfg_feature.melspec_kwargs}
-        ##########################################################
+
         self.x_mfcc = torchaudio.transforms.MFCC(melkwargs=melkwargs)
         self.x_melspec = torchaudio.transforms.MelSpectrogram(**melkwargs)
-        ##########################################################
-
-        # self.cfg = cfg
-
 
         self.cfg_model = cfg_model
         self.cfg_feature = cfg_feature
@@ -138,6 +123,15 @@ class AudioDataModule():  # pl.LightningDataModule):
         self.cfg_feature = cfg_feature
         self.pin_memory =  False # True if torch.cuda.is_available() else False 
         
+
+        # get input shape to network 
+        dummpy_ds = self.test_dataloader()
+        
+        x = next(iter(dummpy_ds))
+        input_shape = tuple(x['x'].shape[1:])
+        input_shape = copy.deepcopy(input_shape)
+        self.input_shape = input_shape
+        del dummpy_ds 
 
 
     def train_dataloader(self):
