@@ -14,7 +14,15 @@ from wwv.data import AudioDataModule
 from wwv.util import OnnxExporter
 from wwv.routine import Routine
 
+class Predictor(nn.Module):
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
 
+    def forward(self, x):
+        logits =self.model(x)
+        pred = F.sigmoid(logits)
+        return pred 
 
 
 class Fitter:
@@ -26,7 +34,7 @@ class Fitter:
         self.cfg_signal = cfg.Signal()
         self.cfg_feature = cfg.Feature()
         self.data_path = cfg.DataPath(data_path, self.cfg_model.model_name, self.cfg_model.model_dir)
-
+        self.data_module = None
     def setup(self):
         data_module = AudioDataModule(self.data_path.root_data_dir,
                                     cfg_model=self.cfg_model,
@@ -37,7 +45,7 @@ class Fitter:
         val_loader =  data_module.val_dataloader()
         test_loader =  data_module.test_dataloader()
     
-        return train_loader, val_loader, test_loader
+        return data_module, train_loader, val_loader, test_loader
 
 
     def get_callbacks(self):
@@ -71,7 +79,10 @@ class Fitter:
             kwargs = {"num_blocks":self.cfg_model.num_blocks,"dropout":0.2}
         
 
-        train_loader, val_loader, test_loader = self.setup()
+        data_module, train_loader, val_loader, test_loader = self.setup()
+
+        input_shape = data_module.input_shape
+
         model = Model(**kwargs)
         routine = Routine(model, self.cfg_fitting, self.cfg_model)
         trainer = Trainer(accelerator="gpu",
@@ -89,7 +100,7 @@ class Fitter:
         # PATH  = "/home/akinwilson/Code/pytorch/output/model/ResNet/epoch=18-val_loss=0.15-val_acc=0.95-val_ttr=0.92-val_ftr=0.03.ckpt"                  
         trainer.fit(routine, train_dataloaders=train_loader, val_dataloaders=val_loader) # ,ckpt_path=PATH)
         trainer.test(dataloaders=test_loader)
-        return trainer 
+        return input_shape, trainer 
 
 
 
@@ -105,27 +116,14 @@ if __name__ == "__main__":
     cfg_feature = cfg.Feature()
     cfg_model = cfg.HTSwin() # cfg.ResNet(), cfg.DeepSpeech()
     
+    model = {"HSTAT": HTSwinTransformer,"ResNet":ResNet,"DeepSpeech": DeepSpeech}[cfg_model.model_name]
 
-
-    arch = {"HSTAT": HTSwinTransformer,"ResNet":ResNet,"DeepSpeech": DeepSpeech}
-
-    fitter =Fitter(arch[cfg_model.model_name], cfg_model, cfg)
-    fitted = fitter()
-
+    fitter =Fitter(model, cfg_model, cfg)
+    input_shape, fitted = fitter()
     model = fitted.model.module.module.model
-
-    class Predictor(nn.Module):
-        def __init__(self, model):
-            super().__init__()
-            self.model = model
-
-        def forward(self, x):
-            logits =self.model(x)
-            pred = F.sigmoid(logits)
-            return pred 
 
     predictor = Predictor(model)
     OnnxExporter(model=predictor,
                 model_name=fitter.cfg_model.model_name, 
-                input_shape=(1, 40, 75),
+                input_shape=input_shape,
                 output_dir=fitter.data_path.model_dir, op_set=12)()
