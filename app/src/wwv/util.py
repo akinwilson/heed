@@ -12,9 +12,6 @@ import torch.nn.functional as F
 from tensorflow import lite
 import tensorflow as tf
 import tensorflow_model_optimization as tfmot
-from pathlib import Path 
-import sys
-import os
 import onnx
 from onnx_tf.backend import prepare
 
@@ -33,10 +30,10 @@ class Predictor(nn.Module):
 
 class OnnxExporter:
 
-    def __init__(self, model, cfg, output_dir, input_shape, op_set=17):
+    def __init__(self, model, model_name , output_dir, input_shape, op_set=17):
         
-        self.cfg = cfg
-        self.model_name = cfg.model_name 
+
+        self.model_name = model_name 
         self.model = model
         self.output_dir =output_dir
         self.op_set = op_set
@@ -151,16 +148,16 @@ class TfliteConverter:
         # convert model in memory 
         tflite_model = converter.convert()
         # save converted in-memory model 
-        with open(out_lite_path, "wb") as file_handle: 
+        with open(self.out_lite_path, "wb") as file_handle: 
             file_handle.write(tflite_model)
 
-        if quantise:
+        if self.quantise:
             # convert torch test set into tf dataset for quantisation purposes 
             test_loader = self.test_loader
             x, y = self.get_torch_representative_dataset(test_loader)
-            representative_dataset = torch_to_tf_dataset(x,y)
+            representative_dataset = self.torch_to_tf_dataset(x,y)
             # quantise the model 
-            converter = lite.TFLiteConverter.from_saved_model(model_out_path)
+            converter = lite.TFLiteConverter.from_saved_model(self.out_path)
             converter.optimizations = [tf.lite.Optimize.DEFAULT]
 
             converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
@@ -170,7 +167,7 @@ class TfliteConverter:
             converter.representative_dataset = representative_dataset
 
             tflite_quant_model = converter.convert()
-            with open(out_quant_lite_path, "wb") as file_handle:
+            with open(self.out_quant_lite_path, "wb") as file_handle:
 
                 file_handle.write(tflite_quant_model)
 
