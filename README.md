@@ -46,7 +46,7 @@ The tree structure for the directory should be as follows:
 
 Fit a model via running the script:
 
-`fit_model.py`
+`fit.py`
 
 
 You will have a directory produces called `/output` in the root directory of the repository. In there you will find the `model.onnx` that is needed to be placed into the `/deploy/model` directory, for the deployment to work. 
