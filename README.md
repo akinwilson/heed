@@ -44,7 +44,12 @@ The tree structure for the directory should be as follows:
 
 ### Getting a model 
 
-At the moment, the easiest way for you to get a model.onnx file to test the endpoint is via running the first couple of cells of `/notebooks/arch-testing.ipynb`. You will have a directory produces called `/output` in the root directory of the repository. In there you will find the `model.onnx` that is needed to be placed into the `/deploy/model` directory, for the deployment to work. 
+Fit a model via running the script:
+
+`fit_model.py`
+
+
+You will have a directory produces called `/output` in the root directory of the repository. In there you will find the `model.onnx` that is needed to be placed into the `/deploy/model` directory, for the deployment to work. 
 
 
 ### Building deployment container
@@ -73,8 +78,8 @@ Enter the command: `../app && python main.py`
 To start the server. Obviously you can start the server with single command  
 Go to http://0.0.0.0:8080/docs to test out the enpoint via the swagger UI. 
 
-To do:
-4th November 2022
+## To do: 5th November 2022
+
 - [x] Get one architecture working, as in fitting, and saving 
 - [x] Extend model zoo
 - [x] parameterised the feature input dimensions, and pass this to the onnx

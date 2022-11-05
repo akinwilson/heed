@@ -18,11 +18,10 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class Scaler(nn.Module):
-    def __init__(self, cfg):
+    def __init__(self):
         super().__init__()
-
         self.register_buffer("int16_max", torch.tensor([32767]).float())
-        self.cfg = cfg 
+        # self.cfg = cfg 
 
 
     def forward(self, x:torch.tensor):

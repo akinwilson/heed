@@ -10,3 +10,5 @@ speech_commands_v0.02.tar.gz
 *__pycache__*
 /dataset
 .~lock.reducing-inference-time.odp#
+*/tflite
+*/tf

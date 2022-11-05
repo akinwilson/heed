@@ -1,6 +1,9 @@
 '''
 Processing, training, data, model and augmentation configuration 
 definition
+
+Have created model dataclasses to tried to isolated factors of concerns on per model basis 
+Note, there is overlap in attributes at the moment amongst the data classes. 
 '''
 import numpy as np 
 import json
@@ -11,6 +14,14 @@ from collections import defaultdict
 from pathlib import Path 
 
 
+@dataclass
+class ResNet:
+    '''Residual network architectural parameters'''
+    num_blocks: List = field( default_factory = lambda : [4, 6, 18, 3] )
+    audio_feature: str = "mfcc" 
+    model_name: str = "ResNet"
+    model_dir: str =  "/home/akinwilson/Code/pytorch/output/model"
+    max_sample_len : int = 32000 
 
 @dataclass 
 class HTSwin:
@@ -19,30 +30,20 @@ class HTSwin:
     spec_size: int =  256
     patch_size: int = 4 
     stride: Tuple[int] = (2, 2)
-    num_head: List = field(default_factory= lambda : [4,8,16,32])
-    dim: int = 96
-    num_classes: int = 2
-    depth: List = field(default_factory= lambda : [2,6,6,4])
-
-    # @dataclass
-    # class Signal:
-    #     ''' Parameters for signal processing of HTSwin '''
-    #     sample_rate : int = 16000
-    #     audio_duration : int = 2
-    #     clip_samples : int = int(sample_rate * audio_duration)
-    #     window_size : int = 512
-    #     hop_size  : int= 256
-    #     mel_bins : int = 64
-    #     fmin : int = 50
-    #     fmax : int = 14000
-    #     shift_max : int = int(clip_samples * 0.5)
-    #     enable_tscam : bool = field(default=True, metadata= { "help":  "Enbale the token-semantic layer"})
-
+    num_head: List = field(default_factory= lambda : [4,8,16,8])
+    dim: int = 48
+    num_classes: int = 1
+    depth: List = field(default_factory= lambda : [2,6,4,2])
+    audio_feature: str = "pcm" # required for dataloading pipeline to extract correct features 
+    model_name: str = "HSTAT" # 
+    max_sample_len : int = 32000 
+     
+    model_dir: str =  "/home/akinwilson/Code/pytorch/output/model"
 
 
 @dataclass
 class Signal:
-    ''' Parameters for signal processing of HTSwin '''
+    ''' Parameters for signal processing of model. Corresponds ot HTS atm but want generic signal param class'''
     sample_rate : int = 16000
     audio_duration : int = 2
     clip_samples : int = int(sample_rate * audio_duration)
@@ -53,16 +54,14 @@ class Signal:
     fmax : int = 14000
     shift_max : int = int(clip_samples * 0.5)
     enable_tscam : bool = field(default=True, metadata= { "help":  "Enbale the token-semantic layer"})
-
-
-@dataclass
-class ResNet:
-    '''Residual network architectural parameters'''
-    num_blocks: List = field( default_factory = lambda : [4, 6, 18, 3] )
     
+
+
+
+
 @dataclass
 class Feature:
-
+    ''' Parameters for signal processing of model. Corresponds to signal proccessing for edge device detector'''
     audio_duration: float = 1.5
     sample_rate:int = 16000
     window_len:int = int( 0.040 * sample_rate )
@@ -88,21 +87,24 @@ class Feature:
 
 @dataclass 
 class Fitting:
+    ''' Parameters fitting of model. Corresponds all models, with focus on HST and custom learning scheduler'''
     batch_size: int  = 16
     learning_rate: float = 1e-3 
     max_epoch : int = 500
     num_workers : int  = 18
     lr_scheduler_epoch : List  =  field(default_factory=  lambda : [10,20,30])
     lr_rate : List = field(default_factory = lambda :  [0.02, 0.05, 0.1])
-    es_patience: int = 25
-    train_bs : int = 16
-    val_bs : int  = 16
-    test_bs : int = 16
+    es_patience: int = 8
+    
+    train_bs : int = 32
+    val_bs : int  = 32
+    test_bs : int = 32
 
 
 
 @dataclass
 class DataPath:
+    ''' Input data paths, checks for files that are supposed to exist during init to. Like train.csv etc.'''
     root_data_dir : str  = field(
         metadata={
             "help": "Root directory of training, validation and testing csv files"
@@ -137,43 +139,6 @@ class DataPath:
         model_dir.mkdir(parents=True, exist_ok=True)
         self.model_dir = str(model_dir)
         
-
-
-
-# @dataclass
-# class Config:
-#     model_name = params['model_name']
-#     audio_feature = params['audio_feature']
-#     audio_duration:int = 3
-#     sr = 16000
-#     audio_feature_param = params['audio_feature_param']
-#     augmentation = params['augmentation']
-#     augmentation_param =  params['augmentation_param']
-#     fit_param = params['fit_param']
-#     data_param = params['data_param']
-#     path = params['path']
-#     verbose = params['verbose']# True
-#     lr_scheduler_epoch = [100,200,300]
-#     lr_rates = [0.02, 0.05, 0.1] 
-
-    
-#     max_sample_len =  int(audio_duration * sr)
-
-    # def processing_output_shape(self):
-    #     attrname = 'audio_feature_param'
-    #     if self.audio_feature == "mfcc":
-    #         n_mfcc =  getattr(self,attrname)[self.audio_feature]['n_mfcc']
-    #         hop_len = getattr(self,attrname)[self.audio_feature]['hop_length']
-
-    #         time_step = int(np.around(self.max_sample_len / hop_len, 0))
-    #         return  (n_mfcc, time_step)
-    #     if self.audio_feature == "spectrogram":
-    #         freq_bins =  getattr(self,attrname)[self.audio_feature]["n_mels"]
-    #         hop_len =  getattr(self,attrname)[self.audio_feature]["hop_length"]
-    #         time_steps = int(np.around(self.max_sample_len / hop_len, 0))
-    #         return  (freq_bins,time_steps)
-    #     if self.audio_feature == "pcm":
-    #         return self.max_sample_len
 
 
 
