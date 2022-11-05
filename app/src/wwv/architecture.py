@@ -128,16 +128,6 @@ class VecM5(nn.Module):
 
 
 
-
-
-MODELS = {
-    "VecM5":VecM5, 
-    # "Resnet": ResNet,
-    # "HSTAT":HSTAT,
-    # "DeepSpeech": DeepSpeech
-}
-
-
 ##################################################################################################################################
 #  Old style init architectue 
 #
