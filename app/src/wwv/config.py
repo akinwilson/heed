@@ -19,10 +19,15 @@ class HTSwin:
     spec_size: int =  256
     patch_size: int = 4 
     stride: Tuple[int] = (2, 2)
-    num_head: List = field(default_factory= lambda : [4,8,16,32])
-    dim: int = 96
-    num_classes: int = 2
-    depth: List = field(default_factory= lambda : [2,6,6,4])
+    num_head: List = field(default_factory= lambda : [4,8,16,8])
+    dim: int = 48
+    num_classes: int = 1
+    depth: List = field(default_factory= lambda : [2,6,4,2])
+    audio_feature: str = "pcm" # required for dataloading pipeline to extract correct features 
+    model_name: str = "HSTAT" # 
+    max_sample_len : int = 32000 
+     
+    model_dir: str =  "/home/akinwilson/Code/pytorch/output/model"
 
     # @dataclass
     # class Signal:
@@ -53,12 +58,15 @@ class Signal:
     fmax : int = 14000
     shift_max : int = int(clip_samples * 0.5)
     enable_tscam : bool = field(default=True, metadata= { "help":  "Enbale the token-semantic layer"})
-
+    
 
 @dataclass
 class ResNet:
     '''Residual network architectural parameters'''
     num_blocks: List = field( default_factory = lambda : [4, 6, 18, 3] )
+    audio_feature: str = "mfcc" 
+    model_name: str = "ResNet"
+
     
 @dataclass
 class Feature:
@@ -95,9 +103,10 @@ class Fitting:
     lr_scheduler_epoch : List  =  field(default_factory=  lambda : [10,20,30])
     lr_rate : List = field(default_factory = lambda :  [0.02, 0.05, 0.1])
     es_patience: int = 25
-    train_bs : int = 16
-    val_bs : int  = 16
-    test_bs : int = 16
+
+    train_bs : int = 32
+    val_bs : int  = 32
+    test_bs : int = 32
 
 
 
