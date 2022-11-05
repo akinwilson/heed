@@ -14,6 +14,25 @@ from collections import defaultdict
 from pathlib import Path 
 
 
+
+@dataclass 
+class Fitting:
+    ''' Parameters fitting of model. Corresponds all models, with focus on HST and custom learning scheduler'''
+    batch_size: int  = 16
+    learning_rate: float = 1e-3 
+    max_epoch : int = 10
+    num_workers : int  = 18
+    lr_scheduler_epoch : List  =  field(default_factory=  lambda : [10,20,30])
+    lr_rate : List = field(default_factory = lambda :  [0.02, 0.05, 0.1])
+    es_patience: int = 8
+    fast_dev_run: bool =  field(default=False)
+    resume_from_checkpoint : str = field(default=None)
+    train_bs : int = 32
+    val_bs : int  = 32
+    test_bs : int = 32
+
+
+
 @dataclass
 class ResNet:
     '''Residual network architectural parameters'''
@@ -22,6 +41,7 @@ class ResNet:
     model_name: str = "ResNet"
     model_dir: str =  "/home/akinwilson/Code/pytorch/output/model"
     max_sample_len : int = 32000 
+    onnx_op_set : int =  12
 
 @dataclass 
 class HTSwin:
@@ -37,8 +57,39 @@ class HTSwin:
     audio_feature: str = "pcm" # required for dataloading pipeline to extract correct features 
     model_name: str = "HSTAT" # 
     max_sample_len : int = 32000 
-     
+    onnx_op_set : int =  17
     model_dir: str =  "/home/akinwilson/Code/pytorch/output/model"
+
+
+@dataclass
+class DeepSpeech:
+    '''DeepSpeech network architectural parameters'''
+    audio_feature: str = "mfcc" 
+    model_name: str = "DeepSpeech"
+    model_dir: str =  "/home/akinwilson/Code/pytorch/output/model"
+    max_sample_len : int = 32000
+    onnx_op_set : int =  12
+
+
+@dataclass
+class LeeNet:
+    '''LeeNet network architectural parameters'''
+    audio_feature: str = "mfcc" 
+    model_name: str = "LeeNet"
+    model_dir: str =  "/home/akinwilson/Code/pytorch/output/model"
+    max_sample_len : int = 32000 
+    onnx_op_set : int =  12
+
+@dataclass
+class MobileNet:
+    '''MobileNet network architectural parameters'''
+    audio_feature: str = "mfcc" 
+    model_name: str = "MobileNet"
+    model_dir: str =  "/home/akinwilson/Code/pytorch/output/model"
+    max_sample_len : int = 32000 
+    onnx_op_set : int =  12
+
+
 
 
 @dataclass
@@ -83,22 +134,6 @@ class Feature:
                                  "pad_mode":"reflect",
                                  "f_min" : self.low_freq,
                                  "f_max" : self.high_freq} 
-
-
-@dataclass 
-class Fitting:
-    ''' Parameters fitting of model. Corresponds all models, with focus on HST and custom learning scheduler'''
-    batch_size: int  = 16
-    learning_rate: float = 1e-3 
-    max_epoch : int = 500
-    num_workers : int  = 18
-    lr_scheduler_epoch : List  =  field(default_factory=  lambda : [10,20,30])
-    lr_rate : List = field(default_factory = lambda :  [0.02, 0.05, 0.1])
-    es_patience: int = 8
-    
-    train_bs : int = 32
-    val_bs : int  = 32
-    test_bs : int = 32
 
 
 

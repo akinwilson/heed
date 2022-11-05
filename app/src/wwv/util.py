@@ -14,7 +14,7 @@ import tensorflow as tf
 import tensorflow_model_optimization as tfmot
 import onnx
 from onnx_tf.backend import prepare
-
+from pytorch_lightning.callbacks import EarlyStopping,ModelCheckpoint,LearningRateMonitor
 
 
 class Predictor(nn.Module):
@@ -26,6 +26,31 @@ class Predictor(nn.Module):
         logits =self.model(x)
         pred = F.sigmoid(logits)
         return pred 
+
+
+
+
+
+class CallbackCollection:
+
+    def __init__(self, cfg_fitting, data_path) -> None:
+        self.cfg_fitting = cfg_fitting
+        self.data_path = data_path
+
+    def __call__ (self):            
+        lr_monitor = LearningRateMonitor(logging_interval='epoch')
+
+        early_stopping = EarlyStopping(mode="min", monitor='val_loss', patience=self.cfg_fitting.es_patience)
+
+        checkpoint_callback = ModelCheckpoint(monitor="val_loss",
+                                                dirpath=self.data_path.model_dir,
+                                                save_top_k=2,
+                                                mode="min",
+                                                filename='{epoch}-{val_loss:.2f}-{val_acc:.2f}-{val_ttr:.2f}-{val_ftr:.2f}')
+
+        callbacks = [checkpoint_callback, lr_monitor, early_stopping]
+        return callbacks
+
 
 
 class OnnxExporter:
