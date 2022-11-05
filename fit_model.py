@@ -3,6 +3,10 @@ os.environ["CUDA_VISIBLE_DEVICES"]="0,1,3"
 from wwv.Architecture.ResNet.model import ResNet
 from wwv.Architecture.HTSwin.model import HTSwinTransformer
 from wwv.Architecture.DeepSpeech.model import DeepSpeech
+from wwv.data import AudioDataModule
+from wwv.util import OnnxExporter
+from wwv.routine import Routine
+import wwv.config as cfg  
 
 import torch.nn.functional as F 
 from pytorch_lightning import Trainer
@@ -10,9 +14,16 @@ import torch.nn.functional as F
 from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.callbacks import EarlyStopping,ModelCheckpoint,LearningRateMonitor
 
-from wwv.data import AudioDataModule
-from wwv.util import OnnxExporter
-from wwv.routine import Routine
+
+import torch 
+import torch.nn as nn 
+
+
+import logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.addHandler(logging.StreamHandler())
+
 
 class Predictor(nn.Module):
     def __init__(self, model):
@@ -106,23 +117,29 @@ class Fitter:
 
 
 if __name__ == "__main__":
-    import torch 
-    import torch.nn as nn 
-    import wwv.config as cfg  
+    
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    parser.add_argument('--model_name', type=str, default="HSTAT")
+    args, _ = parser.parse_known_args()
+
 
     torch.cuda.is_available()
     cfg_fitting = cfg.Fitting()
     cfg_signal = cfg.Signal()
     cfg_feature = cfg.Feature()
-    cfg_model = cfg.HTSwin() # cfg.ResNet(), cfg.DeepSpeech()
+
+    # look into the config.py file so see what available model classes there are 
     
-    model = {"HSTAT": HTSwinTransformer,"ResNet":ResNet,"DeepSpeech": DeepSpeech}[cfg_model.model_name]
-
+    cfg_model = {"HSTAT": cfg.HTSwin(),"ResNet":cfg.ResNet(),"DeepSpeech":  cfg.DeepSpeech()}[args.model_name]
+    model = {"HSTAT": HTSwinTransformer,"ResNet":ResNet,"DeepSpeech": DeepSpeech}[args.model_name]
+    
     fitter =Fitter(model, cfg_model, cfg)
+    # hacky for input shape 
     input_shape, fitted = fitter()
-    model = fitted.model.module.module.model
+    model_fitted = fitted.model.module.module.model
 
-    predictor = Predictor(model)
+    predictor = Predictor(model_fitted)
     OnnxExporter(model=predictor,
                 model_name=fitter.cfg_model.model_name, 
                 input_shape=input_shape,

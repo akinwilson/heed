@@ -78,8 +78,8 @@ Enter the command: `../app && python main.py`
 To start the server. Obviously you can start the server with single command  
 Go to http://0.0.0.0:8080/docs to test out the enpoint via the swagger UI. 
 
-To do:
-4th November 2022
+## To do: 5th November 2022
+
 - [x] Get one architecture working, as in fitting, and saving 
 - [x] Extend model zoo
 - [x] parameterised the feature input dimensions, and pass this to the onnx
