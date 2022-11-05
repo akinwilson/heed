@@ -1,14 +1,22 @@
 # Audio classification pipeline 
 
-## Date: 3rd November 2022 updates
+## Date: 5rd November 2022 updates
 
-- Now have means of converting model from onnx to TFline via `TfliteConverter` in `app/src/wwv/util.py`
+- Now have means of converting model from onnx to TFline via `TfliteConverter` in `app/src/wwv/util.py`. But it is a bit dodgy. 
+
 - `OnnxExporter` in `app/src/wwv/util.py` now accepts _opset_version_ and _input_shape_ as arguments
-- Currently, feature extraction baked into data loading pipeline. But tested with Torchlibrosa and can now export part of model with onnx opset 17
-- Expanded model zoo 
-- `app/src/wwv/routine.py` contains pytorch lightning training, validating testing loops packaging a model architecture for fitting
+- Feature extraction atm in data loader pipeline. But tested with Torchlibrosa and can now export part of model with onnx opset 17
+- `../fit.py` now allows for multi-architecture training via passing command line args `--model_name MODEL_STRING` to script.
+where `MODEL_STRING` can be: 
+  1) ResNet
+  2) HSTAT
+  3) DeepSpeech
+  4) LeeNet
+  5) MobileNet
 
-<br>
+- `app/src/wwv/routine.py` contains pytorch lightning training, validating testing loops packaging a model architecture for fitting; works for both binary classification and localisation tasks 
+
+
 
 | Model name       |               Task |                       Size |                              Caveats | Type | TTR | FTR | Acc| 
 | ----------- |        ----------- | -----------                |                          ----------- |----------- | - | -| - |
@@ -21,11 +29,7 @@
 
 
 
-<br>
-To do:
+## **To Dos 5rd November 2022**:
 
-- [ ] Parameterise trainer whilst in the pipeline
-- [ ] Find a way to inlucde programmatically in the data loader, what
-  transformation to apply. 
 - [ ] Include functional augmentation in the dataloader 
 
