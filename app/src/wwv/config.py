@@ -5,14 +5,11 @@ definition
 Have created model dataclasses to tried to isolated factors of concerns on per model basis 
 Note, there is overlap in attributes at the moment amongst the data classes. 
 '''
-import numpy as np 
-import json
 import os
-from dataclasses import asdict, dataclass, field
-from typing import Tuple,List, Dict, DefaultDict
-from collections import defaultdict
+import numpy as np 
 from pathlib import Path 
-
+from typing import Tuple,List
+from dataclasses import dataclass, field
 
 
 @dataclass 
@@ -31,6 +28,15 @@ class Fitting:
     val_bs : int  = 32
     test_bs : int = 32
 
+
+@dataclass
+class CNNAE:
+    '''CNN autoencoder architectural parameters'''
+    audio_feature: str = "pmc" 
+    model_name: str = "CNNAE"
+    model_dir: str =  "/home/akinwilson/Code/pytorch/output/model"
+    max_sample_len : int = 32000 
+    onnx_op_set : int =  12
 
 
 @dataclass
