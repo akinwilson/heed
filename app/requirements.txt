@@ -12,6 +12,7 @@ pandas
 matplotlib
 https://download.pytorch.org/whl/nightly/
 onnxruntime-gpu
+onnxruntime
 onnx
 latex
 torchlibrosa
