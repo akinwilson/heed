@@ -37,7 +37,7 @@ STR_TO_MODEL_CFGS = {
     "LeeNet": cfg.LeeNet(),
     "MobileNet": cfg.MobileNet(),
 }
-STR_TO_MODLES = {
+STR_TO_MODELS = {
     "HSTAT": HTSwinTransformer,
     "ResNet": ResNet,
     "DeepSpeech": DeepSpeech,
@@ -179,7 +179,7 @@ if __name__ == "__main__":
     # look into the config.py file so see what available model classes there are
     cfg_model = STR_TO_MODEL_CFGS[args.model_name]
     # select comp graph/model arch
-    model = STR_TO_MODLES[args.model_name]
+    model = STR_TO_MODELS[args.model_name]
     # init the fitter <---- associated  data loaders and fitting routine to model
     fitter = Fitter(model, cfg_model, cfg)
     # Get back input_shapes and fitted_trainer from fitter
