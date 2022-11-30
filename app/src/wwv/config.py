@@ -40,6 +40,15 @@ class CNNAE:
 
 
 @dataclass
+class AEClassifier:
+    '''Dense example classifier'''
+    model_name: str = "AE_Classifier"
+    model_dir: str =  "/home/akinwilson/Code/pytorch/output/model"
+    onnx_op_set : int =  12
+
+
+
+@dataclass
 class ResNet:
     '''Residual network architectural parameters'''
     num_blocks: List = field( default_factory = lambda : [4, 6, 18, 3] )
@@ -183,42 +192,42 @@ class DataPath:
 
 
 
-class Config:
-    def __init__(self, params):
-        self.model_name = params['model_name']
-        self.audio_feature = params['audio_feature']
-        self.audio_duration = params['audio_duration']
-        self.sr = params['sample_rate']
-        self.audio_feature_param = params['audio_feature_param']
-        self.augmentation = params['augmentation']
-        self.augmentation_param =  params['augmentation_param']
-        self.fit_param = params['fit_param']
-        self.data_param = params['data_param']
-        self.path = params['path']
-        self.verbose = params['verbose']# True
-        self.lr_scheduler_epoch = [100,200,300]
-        self.lr_rates = [0.02, 0.05, 0.1] 
+# class Config:
+#     def __init__(self, params):
+#         self.model_name = params['model_name']
+#         self.audio_feature = params['audio_feature']
+#         self.audio_duration = params['audio_duration']
+#         self.sr = params['sample_rate']
+#         self.audio_feature_param = params['audio_feature_param']
+#         self.augmentation = params['augmentation']
+#         self.augmentation_param =  params['augmentation_param']
+#         self.fit_param = params['fit_param']
+#         self.data_param = params['data_param']
+#         self.path = params['path']
+#         self.verbose = params['verbose']# True
+#         self.lr_scheduler_epoch = [100,200,300]
+#         self.lr_rates = [0.02, 0.05, 0.1] 
 
-    @property
-    def max_sample_len(self):
-        return int(self.audio_duration * self.sr)
+#     @property
+#     def max_sample_len(self):
+#         return int(self.audio_duration * self.sr)
 
-    @property 
-    def processing_output_shape(self):
-        attrname = 'audio_feature_param'
-        if self.audio_feature == "mfcc":
-            n_mfcc =  getattr(self,attrname)[self.audio_feature]['n_mfcc']
-            hop_len = getattr(self,attrname)[self.audio_feature]['hop_length']
+#     @property 
+#     def processing_output_shape(self):
+#         attrname = 'audio_feature_param'
+#         if self.audio_feature == "mfcc":
+#             n_mfcc =  getattr(self,attrname)[self.audio_feature]['n_mfcc']
+#             hop_len = getattr(self,attrname)[self.audio_feature]['hop_length']
 
-            time_step = int(np.around(self.max_sample_len / hop_len, 0))
-            return  (n_mfcc, time_step)
-        if self.audio_feature == "spectrogram":
-            freq_bins =  getattr(self,attrname)[self.audio_feature]["n_mels"]
-            hop_len =  getattr(self,attrname)[self.audio_feature]["hop_length"]
-            time_steps = int(np.around(self.max_sample_len / hop_len, 0))
-            return  (freq_bins,time_steps)
-        if self.audio_feature == "pcm":
-            return self.max_sample_len
+#             time_step = int(np.around(self.max_sample_len / hop_len, 0))
+#             return  (n_mfcc, time_step)
+#         if self.audio_feature == "spectrogram":
+#             freq_bins =  getattr(self,attrname)[self.audio_feature]["n_mels"]
+#             hop_len =  getattr(self,attrname)[self.audio_feature]["hop_length"]
+#             time_steps = int(np.around(self.max_sample_len / hop_len, 0))
+#             return  (freq_bins,time_steps)
+#         if self.audio_feature == "pcm":
+#             return self.max_sample_len
 
 
 
