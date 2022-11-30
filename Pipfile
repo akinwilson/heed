@@ -233,6 +233,8 @@ xxhash = "==3.0.0"
 yarl = "==1.8.1"
 "zc.lockfile" = "==2.0"
 python-dotenv = "*"
+wwv = {editable = true, path = "./app"}
+onnxruntime = "*"
 
 [dev-packages]
 ipykernel = "*"
