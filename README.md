@@ -78,7 +78,7 @@ Enter the command: `../app && python main.py`
 To start the server. Obviously you can start the server with single command  
 Go to http://0.0.0.0:8080/docs to test out the enpoint via the swagger UI. 
 
-## To do: 5th November 2022
+## To do: 29th November 2022
 
 - [x] Get one architecture working, as in fitting, and saving 
 - [x] Extend model zoo
@@ -101,3 +101,8 @@ supported in opset 17.
 - [x] Add more models to model collection, try finding span prediction dataset.
 - [ ] Add model architecture for localisation task
 - [ ] Integrate feature extraction into model architecture using opset 17 and torch nightly via https://github.com/qiuqiangkong/torchlibrosa TRIED AND TESTED: WORKS FOR OPSET 17
+Research
+- [ ] Implement high-informational content sampling strategy; compare to vanilla strategy the fitting time and achieved metrics 
+- [ ] Representational learning autoencoder visualising embeddings via tensorbaord - build downstrain classifier based auto-encoded representation
+- [ ] Synthetic data generation using variational autoencoder - Train classifier on both mix, purely synthetic and purely the original dataset and compare the results 
+- [ ] Summarise the  

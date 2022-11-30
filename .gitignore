@@ -12,3 +12,4 @@ speech_commands_v0.02.tar.gz
 .~lock.reducing-inference-time.odp#
 */tflite
 */tf
+.env
