@@ -17,11 +17,11 @@ class Fitting:
     ''' Parameters fitting of model. Corresponds all models, with focus on HST and custom learning scheduler'''
     batch_size: int  = 16
     learning_rate: float = 1e-3 
-    max_epoch : int = 10
+    max_epoch : int = 50
     num_workers : int  = 18
     lr_scheduler_epoch : List  =  field(default_factory=  lambda : [10,20,30])
     lr_rate : List = field(default_factory = lambda :  [0.02, 0.05, 0.1])
-    es_patience: int = 8
+    es_patience: int = 10
     fast_dev_run: bool =  field(default=False)
     resume_from_checkpoint : str = field(default=None)
     train_bs : int = 32
@@ -37,6 +37,18 @@ class CNNAE:
     model_dir: str =  "/home/akinwilson/Code/pytorch/output/model"
     max_sample_len : int = 32000 
     onnx_op_set : int =  12
+
+
+
+@dataclass
+class SSCNNAE:
+    '''Semi supervised autoencoding classifier hybrid'''
+    audio_feature: str = "pmc" 
+    model_name: str = "SSCNNAE"
+    model_dir: str =  "/home/akinwilson/Code/pytorch/output/model"
+    max_sample_len : int = 32000 
+    onnx_op_set : int =  12
+
 
 
 @dataclass
