@@ -44,7 +44,9 @@ class AEClassifier:
     '''Dense example classifier'''
     model_name: str = "AE_Classifier"
     model_dir: str =  "/home/akinwilson/Code/pytorch/output/model"
+    max_sample_len : int = 32000 
     onnx_op_set : int =  12
+    audio_feature : str = "pcm"
 
 
 
