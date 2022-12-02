@@ -17,25 +17,13 @@ device = "cpu"  # torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class DataCollator:
-    # def __init__(self):
-    #     # self.cfg = cfg 
 
     def __call__(self, batch):
         x = [ x for (x,_) in batch ]
         y = [ y for (_,y) in batch ]
 
         x_batched = torch.stack(x).float()
-
-        # ####################################################################################################################################
-        # if self.cfg.model_name == "HSTAT":
-        #     x_batched.squeeze_(dim=1) # removing audio channel dim
-        # ####################################################################################################################################
-
         y_batched = torch.stack(y).float()
-        # if self.cfg.verbose:
-        #     logger.info(f"DataCollator().__call__ x_batched [out]: {x_batched.shape}")
-        #     logger.info(f"DataCollator().__call__ y_batched [out]: {y_batched.shape}")
-        # return dictionary for unpacking easily as args 
         return {
         "x": x_batched,
         "y": y_batched
@@ -50,14 +38,8 @@ class Padder:
         padding = torch.tensor([0.0]).repeat([1,self.cfg.max_sample_len - x.size()[-1]])
         x_new = torch.hstack([x, padding])
         x_new = x_new.to(device) 
-        assert x_new.size()[-1] == self.cfg.max_sample_len, f"Incorrect padded length, Should be {self.cfg.max_sample_len}, got {x_new.size()[-1]}"
-        # if self.cfg.verbose:
-        #     logger.info(f"Padder().__call__ x [out]: {x_new.shape}")
-            # x_new = torch.unsqueeze(x_new, dim=1)
-            # logger.info(f"Padder() unsqueeze [out]: {x_new.shape}")
-            
+        assert x_new.size()[-1] == self.cfg.max_sample_len, f"Incorrect padded length, Should be {self.cfg.max_sample_len}, got {x_new.size()[-1]}"            
         return x_new # (1 ,1 , pad_to_len)
-
 
 
 
