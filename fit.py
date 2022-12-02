@@ -17,8 +17,6 @@ import wwv.config as cfg
 import torch.nn.functional as F
 from pytorch_lightning import Trainer
 from pytorch_lightning.loggers import TensorBoardLogger
-
-
 import torch
 import torch.nn as nn
 
