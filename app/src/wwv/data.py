@@ -73,7 +73,8 @@ class AudioDataset(Dataset):
         y =  torch.tensor(int(y), device=device)
         x,_ = ta.load(x_path)
         ##########################################################
-        #   Need to mimic this inside the serving container
+        #  CAN MAKE PART OF ARCHITECTURE WITH 
+        #  https://github.com/qiuqiangkong/torchlibrosa
         ##########################################################
         x = self.x_scale(x)
         x = self.x_pad(x)
