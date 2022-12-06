@@ -39,6 +39,17 @@ class CNNAE:
     onnx_op_set : int =  12
 
 
+@dataclass
+class CVCNNAE:
+    '''Conditional variational convolutional neural network autoencoder'''
+    audio_feature: str = "pmc" 
+    model_name: str = "CVCNNAE"
+    model_dir: str =  "/home/akinwilson/Code/pytorch/output/model"
+    max_sample_len : int = 32000 
+    onnx_op_set : int =  12
+
+
+
 
 @dataclass
 class SSCNNAE:
