@@ -2,6 +2,7 @@ output/
 .ipynb_checkpoints/
 data/
 img/
+run/
 lightning_logs/
 speech_commands_v0.02.tar.gz
 *.ckpt
