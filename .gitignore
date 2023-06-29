@@ -2,7 +2,9 @@ output/
 .ipynb_checkpoints/
 data/
 img/
+**/runs/
 lightning_logs/
+*.odp*
 speech_commands_v0.02.tar.gz
 *.ckpt
 *.onnx
@@ -12,3 +14,7 @@ speech_commands_v0.02.tar.gz
 .~lock.reducing-inference-time.odp#
 */tflite
 */tf
+.env
+app/build/
+*/runs/*
+
