@@ -135,14 +135,19 @@ class Fitter:
             self.cfg_model.model_name == "ResNet"
             or self.cfg_model.model_name == "resnet"
         ):
-            kwargs = {"num_blocks": self.cfg_model.num_blocks, "dropout": 0.2}
+            kwargs = {
+                "num_blocks": self.cfg_model.num_blocks,
+                "dropout": self.cfg_model.dropout,
+            }
 
         elif (
             self.cfg_model.model_name == "LeeNet"
             or self.cfg_model.model_name == "leenet"
         ):
-            kwargs = self.cfg_model.__dict__
-            kwargs = {}
+            kwargs = {
+                "dropout": self.cfg_model.dropout,
+                "channel_order_dims": self.cfg_model.channel_order_dims,
+            }
 
         elif (
             self.cfg_model.model_name == "DeepSpeed"
@@ -248,6 +253,7 @@ def main():
         model=predictor,
         model_name=fitter.cfg_model.model_name,
         input_shape=input_shape,
+        audio_feature=cfg_model.audio_feature,
         output_dir=fitter.data_path.model_dir,
         op_set=cfg_model.onnx_op_set,
     )
