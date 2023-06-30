@@ -99,6 +99,7 @@ class ResNet:
     )
 
     #   [4, 6, 18, 3])
+    dropout: float = float(os.getenv("DROPOUT", 0.1))
     audio_feature: str = os.getenv("AUDIO_FEATURE", "mfcc")
     model_name: str = os.getenv("MODEL_NAME", "ResNet")
     model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
@@ -141,7 +142,14 @@ class LeeNet:
     """LeeNet network architectural parameters"""
 
     audio_feature: str = os.getenv("AUDIO_FEATURE", "pmc")
+    channel_order_dims: List = field(
+        default_factory=lambda: [
+            int(x)
+            for x in os.getenv("CHANNEL_ORDER_DIMS", "1,64,96,128,256,512").split(",")
+        ]
+    )
     model_name: str = os.getenv("MODEL_NAME", "LeeNet")
+    dropout: float = float(os.getenv("DROPOUT", 0.1))
     model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
