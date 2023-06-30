@@ -15,4 +15,5 @@ onnxruntime-gpu
 onnxruntime
 onnx
 latex
+python-dotenv
 torchlibrosa

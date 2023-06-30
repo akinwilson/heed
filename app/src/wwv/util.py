@@ -15,9 +15,8 @@ import torch.nn.functional as F
 # from tensorflow import lite
 # import tensorflow as tf
 # import tensorflow_model_optimization as tfmot
-import onnx
-
 # from onnx_tf.backend import prepare
+
 from pytorch_lightning.callbacks import (
     EarlyStopping,
     ModelCheckpoint,
@@ -47,25 +46,33 @@ class CallbackCollection:
         early_stopping = EarlyStopping(
             mode="min", monitor="val_loss", patience=self.cfg_fitting.es_patience
         )
-
         checkpoint_callback = ModelCheckpoint(
             monitor="val_loss",
             dirpath=self.data_path.model_dir,
             save_top_k=2,
+            save_last=True,
             mode="min",
             filename="{epoch}-{val_loss:.2f}-{val_acc:.2f}-{val_ttr:.2f}-{val_ftr:.2f}",
         )
 
-        callbacks = [checkpoint_callback, lr_monitor, early_stopping]
+        callbacks = {
+            "checkpoint": checkpoint_callback,
+            "lr": lr_monitor,
+            "es": early_stopping,
+        }
+        # callbacks = [checkpoint_callback, lr_monitor, early_stopping]
         return callbacks
 
 
 class OnnxExporter:
-    def __init__(self, model, model_name, output_dir, input_shape, op_set=17):
+    def __init__(
+        self, model, model_name, output_dir, input_shape, audio_feature, op_set=17
+    ):
 
         self.model_name = model_name
         self.model = model
         self.output_dir = output_dir
+        self.audio_feature = audio_feature
         self.op_set = op_set
         self.model.eval()
         assert (
@@ -83,6 +90,8 @@ class OnnxExporter:
         self.onnx_model_path = None
 
     def verify(self):
+        logger.info("Verifying model has been saved correctly ... ")
+        logger.info(f"Loading onnx model from path {self.onnx_model_path} ... ")
         model = onnx.load(self.onnx_model_path)
         onnx.checker.check_model(model)
 
@@ -95,9 +104,10 @@ class OnnxExporter:
 
     # Export the model
     def __call__(self):
-        print("self.output_dir", self.output_dir)
+        # print("self.output_dir", self.output_dir)
         output_path = self.output_dir + "/model.onnx"
-        print("self.output_path", output_path)
+        # print("self.output_path", output_path)
+        self.onnx_model_path = output_path
 
         logger.info(f"Onnx model output path: {output_path}")
 
@@ -106,14 +116,19 @@ class OnnxExporter:
         torch.onnx.export(
             model=model,  # model being run
             args=x_dummy,  # model input (or a tuple for multiple inputs)
-            f=output_path,  # where to save the model (can be a file or file-like object)
+            f=self.onnx_model_path,  # where to save the model (can be a file or file-like object)
             export_params=True,  # store the trained parameter weights inside the model file
             opset_version=self.op_set,  # Only certain operations are available, 17 includes FFTs and IFFTs
             do_constant_folding=True,  # whether to execute constant folding for optimization
-            input_names=["input_mfcc", "dummy_input"],  # the model's input names
+            input_names=[
+                f"input_{self.audio_feature}",
+                "dummy_input",
+            ],  # the model's input names
             output_names=["output_wwp"],  # the model's output names
             dynamic_axes={
-                "input_mfcc": {0: "batch_size"},  # variable length axes
+                f"input_{self.audio_feature}": {
+                    0: "batch_size"
+                },  # variable length axes
                 "output_wwp": {0: "batch_size"},
             },
         )
@@ -128,11 +143,11 @@ class OnnxExporter:
             providers=["CUDAExecutionProvider", "CPUExecutionProvider"],
         )
         # compute ONNX Runtime output prediction
-        logger.info(f"ort_session: {ort_session.__dict__}")
-        logger.info(f"ort_session.get_inputs(): {ort_session.get_inputs()}")
+        # logger.info(f"ort_session: {ort_session.__dict__}")
+        # logger.info(f"ort_session.get_inputs(): {ort_session.get_inputs()}")
         ort_inputs = {ort_session.get_inputs()[0].name: self.to_numpy(self.x_in)}
 
-        logger.info(f"ort_inputs {ort_inputs}")
+        # logger.info(f"ort_inputs {ort_inputs}")
         ort_outs = ort_session.run(None, ort_inputs)
         # compare ONNX Runtime and PyTorch results
         np.testing.assert_allclose(

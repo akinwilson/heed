@@ -10,3 +10,9 @@
 ├── README.md
 └── requirements.txt
 ```
+
+# Fit a model
+
+```
+python fit.py -m {HSTAT|ResNet|DeepSpeech|LeeNet|MobileNet}
+```
