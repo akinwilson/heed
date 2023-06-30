@@ -1,8 +1,34 @@
 import os
+import sys
+import logging
+from dotenv import load_dotenv
 from argparse import ArgumentParser
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,3"
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.addHandler(logging.StreamHandler())
 
+# only set ENV_FILE_PATH during testing
+# how can I get args.model_name.lower()
+
+parser = ArgumentParser()
+MODEL_NAMES = ["HSTAT", "ResNet", "DeepSpeech", "LeeNet", "MobileNet"]
+parser.add_argument(
+    "-m", "--model_name", type=str, default="ResNet", choices=MODEL_NAMES
+)
+args, _ = parser.parse_known_args()
+# model_name = "ResNet".lower()
+# env_filepath = os.getenv("ENVFILE_PATH", f"./env_vars/{model_name}/.dev.env")
+
+# I only know args at main function
+env_filepath = os.getenv(
+    "ENV_FILE_PATH", f"./env_vars/{args.model_name.lower()}/.dev.env"
+)
+
+logger.info(f"Loading env vars from file: {env_filepath}")
+load_dotenv(env_filepath)
+
+# import all available models
 from wwv.Architecture.ResNet.model import ResNet
 from wwv.Architecture.HTSwin.model import HTSwinTransformer
 from wwv.Architecture.DeepSpeech.model import DeepSpeech
@@ -19,14 +45,6 @@ from pytorch_lightning import Trainer
 from pytorch_lightning.loggers import TensorBoardLogger
 import torch
 import torch.nn as nn
-
-
-import logging
-
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-logger.addHandler(logging.StreamHandler())
-
 
 STR_TO_MODEL_CFGS = {
     "HSTAT": cfg.HTSwin(),
@@ -61,7 +79,7 @@ class Fitter:
         model,
         cfg_model,
         cfg,
-        data_path="/home/akinwilson/Code/HTS-Audio-Transformer",
+        data_path="/media/useraye/Samsung_T5/data/audio/keyword-spotting",
     ) -> None:
         self.model = model
         self.cfg_model = cfg_model
@@ -86,7 +104,7 @@ class Fitter:
 
         return data_module, train_loader, val_loader, test_loader
 
-    def callback_list(self):
+    def callbacks(self):
         cfg_fitting = self.cfg_fitting
         data_path = self.data_path
         callback_collection = CallbackCollection(cfg_fitting, data_path)
@@ -94,11 +112,12 @@ class Fitter:
 
     def __call__(self):
         logger = TensorBoardLogger(
-            save_dir=self.data_path.model_dir, version=1, name="lightning_logs"
+            save_dir=self.data_path.model_dir,
+            name="lightning_logs",
         )
         Model = self.model
 
-        if self.cfg_model.model_name == "HSTAT":
+        if self.cfg_model.model_name == "HSTAT" or self.cfg_model.model_name == "hstat":
             kwargs = {
                 "spec_size": self.cfg_model.spec_size,
                 "patch_size": self.cfg_model.patch_size,
@@ -112,13 +131,30 @@ class Fitter:
                 "num_heads": self.cfg_model.num_head,
             }
 
-        elif self.cfg_model.model_name == "ResNet":
+        elif (
+            self.cfg_model.model_name == "ResNet"
+            or self.cfg_model.model_name == "resnet"
+        ):
             kwargs = {"num_blocks": self.cfg_model.num_blocks, "dropout": 0.2}
 
-        elif self.cfg_model.model_name == "LeeNet":
+        elif (
+            self.cfg_model.model_name == "LeeNet"
+            or self.cfg_model.model_name == "leenet"
+        ):
             kwargs = self.cfg_model.__dict__
+            kwargs = {}
 
-        elif self.cfg_model.model_name == "MobileNet":
+        elif (
+            self.cfg_model.model_name == "DeepSpeed"
+            or self.cfg_model.model_name == "deepspeed"
+        ):
+            kwargs = self.cfg_model.__dict__
+            kwargs = {}
+
+        elif (
+            self.cfg_model.model_name == "MobileNet"
+            or self.cfg_model.model_name == "mobilenet"
+        ):
             kwargs = self.cfg_model.__dict__
 
         # get loaders and datamodule to access input shape
@@ -131,16 +167,24 @@ class Fitter:
         # setup training, validating and testing routines for the model
         routine = Routine(model, self.cfg_fitting, self.cfg_model)
         # Init a trainer to execute routine
+        callback_dict = self.callbacks()
+        callback_list = [v for (_, v) in callback_dict.items()]
+        number_devices = os.getenv("CUDA_VISIBLE_DEVICES", "1,").split(",")
+        try:
+            number_devices.remove("")
+        except ValueError:
+            pass
+
         trainer = Trainer(
             accelerator="gpu",
-            devices=3,
-            strategy="dp",
+            devices=len(number_devices),
+            strategy=os.getenv("STRATEGY", "ddp"),
             sync_batchnorm=True,
             logger=logger,
             max_epochs=self.cfg_fitting.max_epoch,
-            callbacks=self.callback_list(),
+            callbacks=callback_list,
             num_sanity_val_steps=2,
-            resume_from_checkpoint=self.cfg_fitting.resume_from_checkpoint,
+            # resume_from_checkpoint=self.cfg_fitting.resume_from_checkpoint,
             gradient_clip_val=1.0,
             fast_dev_run=self.cfg_fitting.fast_dev_run,
         )
@@ -150,30 +194,29 @@ class Fitter:
         trainer.fit(
             routine, train_dataloaders=train_loader, val_dataloaders=val_loader
         )  # ,ckpt_path=PATH)
-        # Trainer executes testing against 'best' model <----- best is specificed by earlier stopping condition or model checkpoint
-        trainer.test(dataloaders=test_loader)
+
+        if self.cfg_fitting.fast_dev_run:
+            # issue with finding best weights path for in fast dev run using last model weights
+            model_ckpt_path = callback_dict["checkpoint"].__dict__["last_model_path"]
+        else:
+            model_ckpt_path = callback_dict["checkpoint"].__dict__["best_model_path"]
+
+        trainer.test(
+            dataloaders=test_loader,
+            ckpt_path=model_ckpt_path,
+        )
         # Return the input_shapes and trainer of the model for exporting
         return input_shape, trainer
 
 
-if __name__ == "__main__":
+def main():
 
-    MODEL_NAMES = ["HSTAT", "ResNet", "DeepSpeech", "LeeNet", "MobileNet"]
-
-    parser = ArgumentParser()
-    #                                            # whats a little dumb about how I do this below, select
-    # the model from the model zoo?
-    parser.add_argument(
-        "--model_name", type=str, default=MODEL_NAMES[MODEL_NAMES.index("ResNet")]
-    )
-    args, _ = parser.parse_known_args()
-
-    logger.info(f"")
-    torch.cuda.is_available()
+    logger.info(f"torch.cuda.is_available(): {torch.cuda.is_available()}")
+    logger.info(f"Training model: {args.model_name}")
     # configs for trainer, features and signal normnalisation  etc. Some overflap
-    cfg_fitting = cfg.Fitting()
-    cfg_signal = cfg.Signal()
-    cfg_feature = cfg.Feature()
+    # cfg_fitting = cfg.Fitting()
+    # cfg_signal = cfg.Signal()
+    # cfg_feature = cfg.Feature()
     # look into the config.py file so see what available model classes there are
     cfg_model = STR_TO_MODEL_CFGS[args.model_name]
     # select comp graph/model arch
@@ -183,9 +226,14 @@ if __name__ == "__main__":
     # Get back input_shapes and fitted_trainer from fitter
     # ********hacky way to get input shape ***************
     input_shape, fitted = fitter()
-    # In data parallelism, fitted_trainer contains model in nested structure.
-    # ********* just condition here or always train in dist env **********
-    model_fitted = fitted.model.module.module.model
+
+    # # In data parallelism, fitted_trainer contains model in nested structure.
+    # # ********* just condition here or always train in dist env **********
+    if os.getenv("STRATEGY", "ddp") == "ddp":
+        model_fitted = fitted.model._modules["model"]
+    else:
+        model_fitted = fitted.model._modules["model"]
+
     # appending probability normalisation layer to model to convert logits to probs.
     # ******** fitting: training and validating, is more stable with these as outputs.
     # ******** See loss function
@@ -205,3 +253,8 @@ if __name__ == "__main__":
     )
     # exporting the model baby!
     onnx_exporter()
+
+
+if __name__ == "__main__":
+    main()
+    sys.exit(0)
