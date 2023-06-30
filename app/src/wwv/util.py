@@ -15,9 +15,8 @@ import torch.nn.functional as F
 # from tensorflow import lite
 # import tensorflow as tf
 # import tensorflow_model_optimization as tfmot
-import onnx
-
 # from onnx_tf.backend import prepare
+
 from pytorch_lightning.callbacks import (
     EarlyStopping,
     ModelCheckpoint,
@@ -47,16 +46,21 @@ class CallbackCollection:
         early_stopping = EarlyStopping(
             mode="min", monitor="val_loss", patience=self.cfg_fitting.es_patience
         )
-
         checkpoint_callback = ModelCheckpoint(
             monitor="val_loss",
             dirpath=self.data_path.model_dir,
             save_top_k=2,
+            save_last=True,
             mode="min",
             filename="{epoch}-{val_loss:.2f}-{val_acc:.2f}-{val_ttr:.2f}-{val_ftr:.2f}",
         )
 
-        callbacks = [checkpoint_callback, lr_monitor, early_stopping]
+        callbacks = {
+            "checkpoint": checkpoint_callback,
+            "lr": lr_monitor,
+            "es": early_stopping,
+        }
+        # callbacks = [checkpoint_callback, lr_monitor, early_stopping]
         return callbacks
 
 
@@ -128,11 +132,11 @@ class OnnxExporter:
             providers=["CUDAExecutionProvider", "CPUExecutionProvider"],
         )
         # compute ONNX Runtime output prediction
-        logger.info(f"ort_session: {ort_session.__dict__}")
-        logger.info(f"ort_session.get_inputs(): {ort_session.get_inputs()}")
+        # logger.info(f"ort_session: {ort_session.__dict__}")
+        # logger.info(f"ort_session.get_inputs(): {ort_session.get_inputs()}")
         ort_inputs = {ort_session.get_inputs()[0].name: self.to_numpy(self.x_in)}
 
-        logger.info(f"ort_inputs {ort_inputs}")
+        # logger.info(f"ort_inputs {ort_inputs}")
         ort_outs = ort_session.run(None, ort_inputs)
         # compare ONNX Runtime and PyTorch results
         np.testing.assert_allclose(

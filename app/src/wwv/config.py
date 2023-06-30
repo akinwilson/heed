@@ -29,27 +29,28 @@ class Fitting:
     lr_rate: List = field(
         default_factory=lambda: [float(x) for x in os.getenv("LR_RATE").split(",")]
     )
-    es_patience: int = os.getenv("ES_PATIENCE", 10)
+    es_patience: int = int(os.getenv("ES_PATIENCE", 10))
     fast_dev_run: bool = field(
         default=False if os.getenv("FAST_DEV_RUN") == "0" else True
     )
+    dev_run: bool = field(default=False if os.getenv("DEV_RUN") == "0" else True)
     resume_from_checkpoint: str = field(
         default=None
         if os.getenv("RESUME_FROM_CHECKPOINT") == "None"
         else os.getenv("RESUME_FROM_CHECKPOINT")
     )
-    train_bs: int = int(os.getenv("TRAIN_BS", 32))
-    val_bs: int = int(os.getenv("VAL_BS", 32))
-    test_bs: int = int(os.getenv("TEST_BS", 32))
+    train_bs: int = int(os.getenv("TRAIN_BATCH_SIZE", 32))
+    val_bs: int = int(os.getenv("VAL_BATCH_SIZE", 32))
+    test_bs: int = int(os.getenv("TEST_BATCH_SIZE", 32))
 
 
 @dataclass
 class CNNAE:
     """CNN autoencoder architectural parameters"""
 
-    audio_feature: str = "pmc"
-    model_name: str = "CNNAE"
-    model_dir: str = "/home/useraye/Code/pytorch/output/model"
+    audio_feature: str = os.getenv("AUDIO_FEATURE", "pmc")
+    model_name: str = os.getenv("MODEL_NAME", "CNNAE")
+    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -58,9 +59,9 @@ class CNNAE:
 class CVCNNAE:
     """Conditional variational convolutional neural network autoencoder"""
 
-    audio_feature: str = "pmc"
-    model_name: str = "CVCNNAE"
-    model_dir: str = "/home/useraye/Code/pytorch/output/model"
+    audio_feature: str = os.getenv("AUDIO_FEATURE", "pmc")
+    model_name: str = os.getenv("MODEL_NAME", "CVCNNAE")
+    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -69,9 +70,9 @@ class CVCNNAE:
 class SSCNNAE:
     """Semi supervised autoencoding classifier hybrid"""
 
-    audio_feature: str = "pmc"
-    model_name: str = "SSCNNAE"
-    model_dir: str = "/home/useraye/Code/pytorch/output/model"
+    audio_feature: str = os.getenv("AUDIO_FEATURE", "pmc")
+    model_name: str = os.getenv("MODEL_NAME", "SSCNNAE")
+    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -80,21 +81,27 @@ class SSCNNAE:
 class AEClassifier:
     """Dense example classifier"""
 
-    model_name: str = "AE_Classifier"
-    model_dir: str = "/home/useraye/Code/pytorch/output/model"
+    model_name: str = os.getenv("MODEL_NAME", "AE_Classifier")
+    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
-    audio_feature: str = "pcm"
+    audio_feature: str = os.getenv("AUDIO_FEATURE", "pcm")
 
 
 @dataclass
 class ResNet:
     """Residual network architectural parameters"""
 
-    num_blocks: List = field(default_factory=lambda: [4, 6, 18, 3])
-    audio_feature: str = "mfcc"
-    model_name: str = "ResNet"
-    model_dir: str = "/home/useraye/Code/pytorch/output/model"
+    num_blocks: List = field(
+        default_factory=lambda: [
+            int(x) for x in os.getenv("NUM_BLOCKS", "4,6,18,3").split(",")
+        ]
+    )
+
+    #   [4, 6, 18, 3])
+    audio_feature: str = os.getenv("AUDIO_FEATURE", "mfcc")
+    model_name: str = os.getenv("MODEL_NAME", "ResNet")
+    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -111,22 +118,20 @@ class HTSwin:
     dim: int = 48
     num_classes: int = 1
     depth: List = field(default_factory=lambda: [2, 6, 4, 2])
-    audio_feature: str = (
-        "pcm"  # required for dataloading pipeline to extract correct features
-    )
-    model_name: str = "HSTAT"  #
+    audio_feature: str = os.getenv("AUDIO_FEATURE", "pcm")
+    model_name: str = os.getenv("MODEL_NAME", "HSTAT")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 17))
-    model_dir: str = "/home/useraye/Code/pytorch/output/model"
+    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
 
 
 @dataclass
 class DeepSpeech:
     """DeepSpeech network architectural parameters"""
 
-    audio_feature: str = "mfcc"
-    model_name: str = "DeepSpeech"
-    model_dir: str = "/home/useraye/Code/pytorch/output/model"
+    audio_feature: str = os.getenv("AUDIO_FEATURE", "mfcc")
+    model_name: str = os.getenv("MODEL_NAME", "DeepSpeech")
+    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -135,9 +140,9 @@ class DeepSpeech:
 class LeeNet:
     """LeeNet network architectural parameters"""
 
-    audio_feature: str = "mfcc"
-    model_name: str = "LeeNet"
-    model_dir: str = "/home/useraye/Code/pytorch/output/model"
+    audio_feature: str = os.getenv("AUDIO_FEATURE", "pmc")
+    model_name: str = os.getenv("MODEL_NAME", "LeeNet")
+    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -146,9 +151,9 @@ class LeeNet:
 class MobileNet:
     """MobileNet network architectural parameters"""
 
-    audio_feature: str = "mfcc"
-    model_name: str = "MobileNet"
-    model_dir: str = "/home/useraye/Code/pytorch/output/model"
+    audio_feature: str = os.getenv("AUDIO_FEATURE", "mfcc")
+    model_name: str = os.getenv("MODEL_NAME", "MobileNet")
+    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 

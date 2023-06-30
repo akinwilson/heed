@@ -1,35 +1,42 @@
-import torch.nn as nn 
-import torch.nn.functional as F 
+import torch.nn as nn
+import torch.nn.functional as F
 
-from .layers import * 
+from .layers import *
 
-import torch 
-import torch.nn  as nn 
+import torch
+import torch.nn as nn
 from torchlibrosa.stft import Spectrogram, LogmelFilterBank
 from torchlibrosa.augmentation import SpecAugmentation
 
 
-
 class LeeNetConvBlock2(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride):
-        
+
         super().__init__()
-        
-        self.conv1 = nn.Conv1d(in_channels=in_channels, 
-                              out_channels=out_channels,
-                              kernel_size=kernel_size, stride=stride,
-                              padding=kernel_size // 2, bias=False)
-                              
-        self.conv2 = nn.Conv1d(in_channels=out_channels, 
-                              out_channels=out_channels,
-                              kernel_size=kernel_size, stride=1,
-                              padding=kernel_size // 2, bias=False)
+
+        self.conv1 = nn.Conv1d(
+            in_channels=in_channels,
+            out_channels=out_channels,
+            kernel_size=kernel_size,
+            stride=stride,
+            padding=kernel_size // 2,
+            bias=False,
+        )
+
+        self.conv2 = nn.Conv1d(
+            in_channels=out_channels,
+            out_channels=out_channels,
+            kernel_size=kernel_size,
+            stride=1,
+            padding=kernel_size // 2,
+            bias=False,
+        )
 
         self.bn1 = nn.BatchNorm1d(out_channels)
         self.bn2 = nn.BatchNorm1d(out_channels)
 
         self.init_weight()
-        
+
     def init_weight(self):
         init_layer(self.conv1)
         init_layer(self.conv2)
@@ -44,7 +51,6 @@ class LeeNetConvBlock2(nn.Module):
         return x
 
 
-
 def do_mixup(x, mixup_lambda):
     """
     Args:
@@ -54,13 +60,17 @@ def do_mixup(x, mixup_lambda):
     Returns:
       out: (batch_size, ...)
     """
-    out = (x.transpose(0,-1) * mixup_lambda + torch.flip(x, dims = [0]).transpose(0,-1) * (1 - mixup_lambda)).transpose(0,-1)
+    out = (
+        x.transpose(0, -1) * mixup_lambda
+        + torch.flip(x, dims=[0]).transpose(0, -1) * (1 - mixup_lambda)
+    ).transpose(0, -1)
     return out
 
+
 def interpolate(x, ratio):
-    """Interpolate data in time domain. This is used to compensate the 
+    """Interpolate data in time domain. This is used to compensate the
     resolution reduction in downsampling of a CNN.
-    
+
     Args:
       x: (batch_size, time_steps, classes_num)
       ratio: int, ratio to interpolate
@@ -74,16 +84,14 @@ def interpolate(x, ratio):
     return upsampled
 
 
-
 class LeeNet(nn.Module):
-    def __init__(self, sample_rate, window_size, hop_size, mel_bins, fmin, 
-        fmax, classes_num):
-        
+    def __init__(self, classes_num=1):
+
         super().__init__()
 
-        window = 'hann'
+        window = "hann"
         center = True
-        pad_mode = 'reflect'
+        pad_mode = "reflect"
         ref = 1.0
         amin = 1e-10
         top_db = None
@@ -99,25 +107,26 @@ class LeeNet(nn.Module):
         self.conv_block9 = LeeNetConvBlock2(512, 1024, 3, 1)
 
         self.fc1 = nn.Linear(1024, 1024, bias=True)
-        self.fc_audioset = nn.Linear(1024, classes_num, bias=True)
-        
+        self.linear = nn.Linear(1024, classes_num, bias=True)
+
         self.init_weight()
 
     def init_weight(self):
         init_layer(self.fc1)
-        init_layer(self.fc_audioset)
- 
-    def forward(self, input, mixup_lambda=None):
+        init_layer(self.linear)
+
+    def forward(self, x, mixup_lambda=None):
         """
         Input: (batch_size, data_length)"""
 
-        x = input[:, None, :]
-
+        # x = input[:, None, :]
+        print("input shape: ", x.shape)
         # Mixup on spectrogram
-        if self.training and mixup_lambda is not None:
-            x = do_mixup(x, mixup_lambda)
-        
+        # if self.training and mixup_lambda is not None:
+        #     x = do_mixup(x, mixup_lambda)
+
         x = self.conv_block1(x)
+        print("self.conv_block1(x): ", x.shape)
         x = F.dropout(x, p=0.1, training=self.training)
         x = self.conv_block2(x, pool_size=3)
         x = F.dropout(x, p=0.1, training=self.training)
@@ -141,8 +150,6 @@ class LeeNet(nn.Module):
         x = F.dropout(x, p=0.5, training=self.training)
         x = F.relu_(self.fc1(x))
         embedding = F.dropout(x, p=0.5, training=self.training)
-        clipwise_output = torch.sigmoid(self.fc_audioset(x))
-        
-        output_dict = {'clipwise_output': clipwise_output, 'embedding': embedding}
+        logits = self.linear(x)
 
-        return output_dict
+        return logits
