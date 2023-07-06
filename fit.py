@@ -1,6 +1,8 @@
 import os
 import sys
+import pwd
 import logging
+
 from dotenv import load_dotenv
 from argparse import ArgumentParser
 
@@ -11,22 +13,31 @@ logger.addHandler(logging.StreamHandler())
 # only set ENV_FILE_PATH during testing
 # how can I get args.model_name.lower()
 
-parser = ArgumentParser()
+
 MODEL_NAMES = ["HSTAT", "ResNet", "DeepSpeech", "LeeNet", "MobileNet"]
+STAGES = ["dev","test","prod" ]
+
+
+parser = ArgumentParser()
 parser.add_argument(
     "-m", "--model_name", type=str, default="ResNet", choices=MODEL_NAMES
+)
+parser.add_argument(
+    "-s", "--stage", type=str, default="dev", choices=STAGES
 )
 args, _ = parser.parse_known_args()
 # model_name = "ResNet".lower()
 # env_filepath = os.getenv("ENVFILE_PATH", f"./env_vars/{model_name}/.dev.env")
 
-# I only know args at main function
+# Using model name to select the env vars to load 
 env_filepath = os.getenv(
-    "ENV_FILE_PATH", f"./env_vars/{args.model_name.lower()}/.dev.env"
+    "ENV_FILE_PATH", f"./env_vars/{args.model_name.lower()}/.{args.stage.lower()}.env"
 )
 
 logger.info(f"Loading env vars from file: {env_filepath}")
 load_dotenv(env_filepath)
+
+
 
 # import all available models
 from wwv.Architecture.ResNet.model import ResNet
@@ -36,7 +47,7 @@ from wwv.Architecture.LeeNet.model import LeeNet
 from wwv.Architecture.MobileNet.model import MobileNet
 
 from wwv.data import AudioDataModule
-from wwv.util import OnnxExporter, CallbackCollection
+from wwv.util import OnnxExporter, CallbackCollection, get_username, change_username_of_dataset_fileloactions
 from wwv.routine import Routine
 import wwv.config as cfg
 
@@ -45,6 +56,12 @@ from pytorch_lightning import Trainer
 from pytorch_lightning.loggers import TensorBoardLogger
 import torch
 import torch.nn as nn
+
+
+no_gpus = torch.cuda.device_count()
+logger.info(f" Resetting number of visible GPUS ... {no_gpus}")
+os.environ['CUDA_VISIBLE_DEVICES'] = ",".join( [str(x) for x in list(range(no_gpus))])
+
 
 STR_TO_MODEL_CFGS = {
     "HSTAT": cfg.HTSwin(),
@@ -73,24 +90,33 @@ class Predictor(nn.Module):
         return pred
 
 
+#  
+
+
+
+
 class Fitter:
     def __init__(
         self,
         model,
         cfg_model,
         cfg,
-        data_path="/media/useraye/Samsung_T5/data/audio/keyword-spotting",
+        data_path=f"/media/{get_username()}/Samsung_T5/data/audio/keyword-spotting",
     ) -> None:
         self.model = model
         self.cfg_model = cfg_model
         self.cfg_fitting = cfg.Fitting()
         self.cfg_signal = cfg.Signal()
         self.cfg_feature = cfg.Feature()
+
         self.data_path = cfg.DataPath(
             data_path, self.cfg_model.model_name, self.cfg_model.model_dir
         )
 
     def setup(self):
+        '''
+        Set up data module and loaders
+        '''
         data_module = AudioDataModule(
             self.data_path.root_data_dir,
             cfg_model=self.cfg_model,
@@ -218,6 +244,9 @@ def main():
 
     logger.info(f"torch.cuda.is_available(): {torch.cuda.is_available()}")
     logger.info(f"Training model: {args.model_name}")
+
+
+    change_username_of_dataset_fileloactions(get_username(),)
     # configs for trainer, features and signal normnalisation  etc. Some overflap
     # cfg_fitting = cfg.Fitting()
     # cfg_signal = cfg.Signal()
@@ -258,7 +287,7 @@ def main():
         op_set=cfg_model.onnx_op_set,
     )
     # exporting the model baby!
-    onnx_exporter()
+    onnxonnx_exporter()
 
 
 if __name__ == "__main__":
