@@ -8,6 +8,7 @@ Note, there is overlap in attributes at the moment amongst the data classes.
 import os
 import numpy as np
 from pathlib import Path
+from .util import get_username
 from typing import Tuple, List
 from dataclasses import dataclass, field
 
@@ -50,7 +51,7 @@ class CNNAE:
 
     audio_feature: str = os.getenv("AUDIO_FEATURE", "pmc")
     model_name: str = os.getenv("MODEL_NAME", "CNNAE")
-    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
+    model_dir: str = os.getenv("MODEL_DIR", "/home/OS_USER/Code/pytorch/output/model").replace("OS_USER", get_username())
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -61,7 +62,7 @@ class CVCNNAE:
 
     audio_feature: str = os.getenv("AUDIO_FEATURE", "pmc")
     model_name: str = os.getenv("MODEL_NAME", "CVCNNAE")
-    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
+    model_dir: str = os.getenv("MODEL_DIR", "/home/OS_USER/Code/pytorch/output/model").replace("OS_USER", get_username())
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -72,7 +73,7 @@ class SSCNNAE:
 
     audio_feature: str = os.getenv("AUDIO_FEATURE", "pmc")
     model_name: str = os.getenv("MODEL_NAME", "SSCNNAE")
-    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
+    model_dir: str = os.getenv("MODEL_DIR", "/home/OS_USER/Code/pytorch/output/model").replace("OS_USER", get_username())
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -82,7 +83,7 @@ class AEClassifier:
     """Dense example classifier"""
 
     model_name: str = os.getenv("MODEL_NAME", "AE_Classifier")
-    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
+    model_dir: str = os.getenv("MODEL_DIR", "/home/OS_USER/Code/pytorch/output/model").replace("OS_USER", get_username())
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
     audio_feature: str = os.getenv("AUDIO_FEATURE", "pcm")
@@ -102,7 +103,7 @@ class ResNet:
     dropout: float = float(os.getenv("DROPOUT", 0.1))
     audio_feature: str = os.getenv("AUDIO_FEATURE", "mfcc")
     model_name: str = os.getenv("MODEL_NAME", "ResNet")
-    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
+    model_dir: str = os.getenv("MODEL_DIR", "/home/OS_USER/Code/pytorch/output/model").replace("OS_USER", get_username())
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -123,7 +124,7 @@ class HTSwin:
     model_name: str = os.getenv("MODEL_NAME", "HSTAT")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 17))
-    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
+    model_dir: str = os.getenv("MODEL_DIR", "/home/OS_USER/Code/pytorch/output/model").replace("OS_USER", get_username())
 
 
 @dataclass
@@ -132,7 +133,7 @@ class DeepSpeech:
 
     audio_feature: str = os.getenv("AUDIO_FEATURE", "mfcc")
     model_name: str = os.getenv("MODEL_NAME", "DeepSpeech")
-    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
+    model_dir: str = os.getenv("MODEL_DIR", "/home/OS_USER/Code/pytorch/output/model").replace("OS_USER", get_username())
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -150,7 +151,7 @@ class LeeNet:
     )
     model_name: str = os.getenv("MODEL_NAME", "LeeNet")
     dropout: float = float(os.getenv("DROPOUT", 0.1))
-    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
+    model_dir: str = os.getenv("MODEL_DIR", "/home/OS_USER/Code/pytorch/output/model").replace("OS_USER", get_username())
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -161,7 +162,7 @@ class MobileNet:
 
     audio_feature: str = os.getenv("AUDIO_FEATURE", "mfcc")
     model_name: str = os.getenv("MODEL_NAME", "MobileNet")
-    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
+    model_dir: str = os.getenv("MODEL_DIR", "/home/OS_USER/Code/pytorch/output/model").replace("OS_USER", get_username())
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
