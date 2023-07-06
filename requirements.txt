@@ -240,6 +240,7 @@ tempdir==0.7.1
 tensorboard==2.13.0
 tensorboard-data-server==0.7.1
 tensorboard-plugin-wit==1.8.1
+optuna==3.3.0
 terminado==0.17.1
 threadpoolctl==3.1.0
 tinycss2==1.2.1
