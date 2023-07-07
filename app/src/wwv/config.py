@@ -32,9 +32,11 @@ class Fitting:
     )
     es_patience: int = int(os.getenv("ES_PATIENCE", 10))
     fast_dev_run: bool = field(
-        default=False if os.getenv("FAST_DEV_RUN") == "0" else True
+        default=True if "1" in os.getenv("FAST_DEV_RUN", "1") else False
     )
-    dev_run: bool = field(default=False if os.getenv("DEV_RUN") == "0" else True)
+    dev_run: bool = field(
+        default=True if "1" in os.getenv("FAST_DEV_RUN", "1") else False
+    )
     resume_from_checkpoint: str = field(
         default=None
         if os.getenv("RESUME_FROM_CHECKPOINT") == "None"

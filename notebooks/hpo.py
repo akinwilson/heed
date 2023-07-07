@@ -1,24 +1,20 @@
+import os
+from dotenv import load_dotenv
+
+model_name = "ResNet"
+env_filepath = os.getenv("ENV_FILE_PATH", f"../env_vars/{model_name.lower()}/.dev.env")
+print(f"Loading env vars from file: {env_filepath}")
+load_dotenv(env_filepath)
+
+
 import optuna
 from optuna.integration import PyTorchLightningPruningCallback
-import os
-
-# os.environ["CUDA_VISIBLE_DEVICES"]="3"
 from wwv.Architecture.ResNet.model import ResNet
 from wwv.routine import Routine
-from wwv.eval import Metric
-from wwv.util import OnnxExporter
 
-import torch
 import torch.nn.functional as F
-from wwv.eval import Metric
-import statistics
 from wwv.data import AudioDataModule
 import wwv.config as cfg
-from torchlibrosa.stft import Spectrogram, LogmelFilterBank
-from torchlibrosa.augmentation import SpecAugmentation
-
-import bisect
-import torch
 from pytorch_lightning import Trainer
 import pytorch_lightning as pl
 import torch.nn.functional as F
@@ -29,8 +25,6 @@ from pytorch_lightning.callbacks import (
     LearningRateMonitor,
     ModelPruning,
 )
-
-from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from wwv.util import get_username
 from wwv.Architecture.ResNet.model import ResNet
@@ -44,22 +38,16 @@ from pytorch_lightning.callbacks import (
     ModelCheckpoint,
     LearningRateMonitor,
 )
-from dotenv import load_dotenv
-import os
+
+
 from wwv.util import change_username_of_dataset_fileloactions, get_username
 
-# Init a trainer to execute routineSTR_TO_MODELS
-from wwv.util import OnnxExporter, CallbackCollection
-
-
-# change_username_of_dataset_fileloactions("useraye", "otis")
 
 import torch.optim as optim
 import optuna
 from optuna import Trial, TrialPruned
 from optuna.trial import TrialState
 
-model_name = "ResNet"
 
 STR_TO_MODEL_CFGS = {
     "HSTAT": cfg.HTSwin(),
@@ -80,12 +68,6 @@ STR_TO_MODELS = {
 cfg_model = STR_TO_MODEL_CFGS[model_name]
 # select comp graph/model arch
 model = STR_TO_MODELS[model_name]
-
-
-env_filepath = os.getenv("ENV_FILE_PATH", f"../env_vars/{model_name.lower()}/.dev.env")
-
-print(f"Loading env vars from file: {env_filepath}")
-load_dotenv(env_filepath)
 
 
 # init the fitter <---- associated  data loaders and fitting routine to model
@@ -154,6 +136,72 @@ def get_callbacks(trial: optuna.trial.Trial):
     )
     callbacks = [checkpoint_callback, lr_monitor, early_stopping]
     return callbacks
+
+
+class Objective:
+    def __init__(self, gpu_queue):
+        # queue to manage GPU ids
+        self.gpu_queue = gpu_queue
+
+    def objective_value(
+        self, trial: optuna.trial.Trial, monitored_metric="val_acc"
+    ) -> float:
+        # print(f"Called objective with trial: {trial.__dict__}")
+        # We optimize the number of layers, hidden units in each layer and dropouts.
+        dropout = trial.suggest_float("dropout", 0.2, 0.5)
+
+        kwargs = {
+            "num_blocks": cfg_model.num_blocks,
+            "dropout": cfg_model.dropout,
+        }
+
+        Model = STR_TO_MODELS[model_name]
+        kwargs["dropout"] = dropout
+
+        model = Model(**kwargs)
+        # setup training, validating and testing routines for the model
+        routine = Routine(model, cfg_fitting, cfg_model)
+
+        callbacks = get_callbacks(trial) + [
+            PyTorchLightningPruningCallback(trial, monitor=monitored_metric)
+        ]
+
+        logger = TensorBoardLogger(
+            save_dir=data_path.model_dir,
+            name="lightning_logs",
+        )
+
+        trainer = Trainer(
+            accelerator="gpu",
+            devices=4,  # len(number_devices),
+            strategy="ddp",  # os.getenv("STRATEGY", "ddp"),
+            sync_batchnorm=True,
+            max_epochs=cfg_fitting.max_epoch,
+            callbacks=callbacks,
+            num_sanity_val_steps=2,
+            logger=logger,
+            gradient_clip_val=1.0,
+            fast_dev_run=cfg_fitting.fast_dev_run,
+        )
+
+        hyperparameters = dict([("dropout", dropout)])
+        trainer.logger.log_hyperparams(hyperparameters)
+
+        trainer.fit(
+            routine, train_dataloaders=train_loader, val_dataloaders=val_loader
+        )  # ,ckpt_path=PATH)
+        print(f"Finished fitting for trial: {trial.number}")
+        val_acc = trainer.callback_metrics["val_acc"].item()
+        return val_acc
+
+    def __call__(self, trial):
+        gpu_id = self.gpu_queue.get()
+
+        obj_val = self.objective_value(trial)
+
+        self.gpu_queue.put(gpu_id)
+
+        return obj_val
 
 
 def objective(trial: optuna.trial.Trial, monitored_metric="val_acc") -> float:
@@ -231,7 +279,20 @@ if __name__ == "__main__":
 
     study = optuna.create_study(direction=direction, pruner=pruner, storage=storage)
     print(f"Created study with direction: {direction}")
-    study.optimize(objective, n_trials=num_trials, timeout=600)
+
+    from multiprocessing import Manager
+    from joblib import parallel_backend
+
+    with Manager() as manager:
+        gpu_queue = manager.Queue()
+        num_gpus = 4
+        for i in range(num_gpus):
+            gpu_queue.put(i)
+
+        with parallel_backend("multiprocessing", n_jobs=num_gpus):
+            study.optimize(
+                Objective(gpu_queue), n_trials=num_trials, timeout=600, n_jobs=1
+            )
 
     pruned_trials = study.get_trials(deepcopy=False, states=[TrialState.PRUNED])
     complete_trials = study.get_trials(deepcopy=False, states=[TrialState.COMPLETE])
