@@ -28,3 +28,4 @@ from inside `./notebooks `
 ```
 python hpo.py
 ```
+**Goal:** fitting routine to be containerised. I want a `.py` file which will perform the HPO step for a specified model.  
