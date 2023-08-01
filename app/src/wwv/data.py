@@ -47,12 +47,20 @@ class AudioDataset(Dataset):
 
         if cfg_fitting.dev_run:
             # using 10 % of available training data
-            self.df = pd.read_csv(df_path).sample(
-                frac=float(os.getenv("FAST_DEV_RUN_FRACTION", 0.1)), ignore_index=True
+            frac = float(os.getenv("FAST_DEV_RUN_FRACTION", 0.1))
+            logger.info(f"Using fraction {frac:.2f} of dataset ... ")
+            self.df = pd.read_csv(df_path, on_bad_lines="skip").sample(
+                frac=frac,
+                ignore_index=True,
             )
+            self.df = self.df[self.df["label"].notna()]
+            print(f"len of DF {len(self.df)}")
+            self.df.reset_index(drop=True, inplace=True)
         else:
-            self.df = pd.read_csv(df_path)
-            
+            # Note too sure whats happened but there are bad entries in the CSV now
+            self.df = pd.read_csv(df_path, on_bad_lines="skip")
+            self.df = self.df[self.df["label"].notna()]
+            self.df.reset_index(drop=True, inplace=True)
 
         self.x_pad = Padder(cfg_model)
         self.x_scale = Scaler()

@@ -1,11 +1,11 @@
 import torch
 import onnx
 import onnxruntime
-import os 
+import os
 import pwd
 import numpy as np
-from pathlib import Path 
-import pandas as pd 
+from pathlib import Path
+import pandas as pd
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 import logging
@@ -28,21 +28,24 @@ from pytorch_lightning.callbacks import (
 )
 
 
-
 def get_username():
-    '''helper function for current OS username'''
+    """helper function for current OS username"""
     return pwd.getpwuid(os.getuid())[0]
 
 
-
 def change_username_of_dataset_fileloactions(new, old=get_username()):
-    root_dir =Path(f"/home/{new}/Code/DL-torch-audio/dataset/keywords") 
+    """
+    Need to use relative paths instead of full paths for the dataset.
+    """
     fs = ["train.csv", "val.csv", "test.csv"]
     for f in fs:
         logger.info(f" changing file location of dataset: {f}")
         df = pd.read_csv(f"/media/{new}/Samsung_T5/data/audio/keyword-spotting/{f}")
         df.wav_path = df.wav_path.str.replace(old, new)
-        df.to_csv(f"/media/{new}/Samsung_T5/data/audio/keyword-spotting/{f}", index=False)
+        df.to_csv(
+            f"/media/{new}/Samsung_T5/data/audio/keyword-spotting/{f}", index=False
+        )
+
 
 class Predictor(nn.Module):
     def __init__(self, model):
