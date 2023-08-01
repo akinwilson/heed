@@ -204,54 +204,54 @@ class Objective:
         return obj_val
 
 
-def objective(trial: optuna.trial.Trial, monitored_metric="val_acc") -> float:
-    # print(f"Called objective with trial: {trial.__dict__}")
-    # We optimize the number of layers, hidden units in each layer and dropouts.
-    dropout = trial.suggest_float("dropout", 0.2, 0.5)
+# def objective(trial: optuna.trial.Trial, monitored_metric="val_acc") -> float:
+#     # print(f"Called objective with trial: {trial.__dict__}")
+#     # We optimize the number of layers, hidden units in each layer and dropouts.
+#     dropout = trial.suggest_float("dropout", 0.2, 0.5)
 
-    kwargs = {
-        "num_blocks": cfg_model.num_blocks,
-        "dropout": cfg_model.dropout,
-    }
+#     kwargs = {
+#         "num_blocks": cfg_model.num_blocks,
+#         "dropout": cfg_model.dropout,
+#     }
 
-    Model = STR_TO_MODELS[model_name]
-    kwargs["dropout"] = dropout
+#     Model = STR_TO_MODELS[model_name]
+#     kwargs["dropout"] = dropout
 
-    model = Model(**kwargs)
-    # setup training, validating and testing routines for the model
-    routine = Routine(model, cfg_fitting, cfg_model)
+#     model = Model(**kwargs)
+#     # setup training, validating and testing routines for the model
+#     routine = Routine(model, cfg_fitting, cfg_model)
 
-    callbacks = get_callbacks(trial) + [
-        PyTorchLightningPruningCallback(trial, monitor=monitored_metric)
-    ]
+#     callbacks = get_callbacks(trial) + [
+#         PyTorchLightningPruningCallback(trial, monitor=monitored_metric)
+#     ]
 
-    logger = TensorBoardLogger(
-        save_dir=data_path.model_dir,
-        name="lightning_logs",
-    )
+#     logger = TensorBoardLogger(
+#         save_dir=data_path.model_dir,
+#         name="lightning_logs",
+#     )
 
-    trainer = Trainer(
-        accelerator="gpu",
-        devices=1,  # len(number_devices),
-        strategy="ddp",  # os.getenv("STRATEGY", "ddp"),
-        sync_batchnorm=True,
-        max_epochs=cfg_fitting.max_epoch,
-        callbacks=callbacks,
-        num_sanity_val_steps=2,
-        logger=logger,
-        gradient_clip_val=1.0,
-        fast_dev_run=cfg_fitting.fast_dev_run,
-    )
+#     trainer = Trainer(
+#         accelerator="gpu",
+#         devices=1,  # len(number_devices),
+#         strategy="ddp",  # os.getenv("STRATEGY", "ddp"),
+#         sync_batchnorm=True,
+#         max_epochs=cfg_fitting.max_epoch,
+#         callbacks=callbacks,
+#         num_sanity_val_steps=2,
+#         logger=logger,
+#         gradient_clip_val=1.0,
+#         fast_dev_run=cfg_fitting.fast_dev_run,
+#     )
 
-    hyperparameters = dict([("dropout", dropout)])
-    trainer.logger.log_hyperparams(hyperparameters)
+#     hyperparameters = dict([("dropout", dropout)])
+#     trainer.logger.log_hyperparams(hyperparameters)
 
-    trainer.fit(
-        routine, train_dataloaders=train_loader, val_dataloaders=val_loader
-    )  # ,ckpt_path=PATH)
-    print(f"Finished fitting for trial: {trial.number}")
-    val_acc = trainer.callback_metrics["val_acc"].item()
-    return val_acc
+#     trainer.fit(
+#         routine, train_dataloaders=train_loader, val_dataloaders=val_loader
+#     )  # ,ckpt_path=PATH)
+#     print(f"Finished fitting for trial: {trial.number}")
+#     val_acc = trainer.callback_metrics["val_acc"].item()
+#     return val_acc
 
 
 # optimizer_name = trial.suggest_categorical("optimizer", ["Adam", "RMSprop", "SGD"])
