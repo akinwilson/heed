@@ -1,1 +1,3 @@
 FROM python:3.9
+
+# Container used for training a model, outputs 
