@@ -1,12 +1,21 @@
 # heed 
 ![]( img/heed.jpg )
 ## Overview 
-heed is a library which fits and locally deploys a collection of deep learning models trained on the task of [key-word spotting](https://en.wikipedia.org/wiki/Keyword_spotting), a server is  created whcih provides a user interface for these trained models to be queried through, using an audio input device of the host machine.
-
-## Installation 
-
+heed is a library which fits and locally deploys a collection of deep learning models trained on the task of [key-word spotting](https://en.wikipedia.org/wiki/Keyword_spotting), a webserver is  created whcih provides a user interface for these trained models to be queried through, using an audio input device of the host machine.
 
 ##  Usage
+
+To begin, clone the repository. 
+
+Unfortunately, the dataset used in this application is private. So running the entire pipeline end to end may not work with a single command for you. Nethertheless, you can used your own [binary classification](https://en.wikipedia.org/wiki/Binary_classification) dataset from the audio domain to substitute for the one used in this repository, or remove the `fitting` service from the `docker-compose.yaml` file and use a pre-trained model that accompanies this repository. 
+
+
+To spin up the model fitting job, model serving and webserver containers, please run:
+```
+docker-compose -f docker-compose.yaml up
+```
+
+
 
 ## Running tests
 
@@ -95,7 +104,7 @@ Enter the command: `../app && python main.py`
 To start the server. Obviously you can start the server with single command  
 Go to http://0.0.0.0:8080/docs to test out the enpoint via the swagger UI. 
 
-## To do: 29th November 2022
+## To do: 31 Dec 2024
 
 - [x] Get one architecture working, as in fitting, and saving 
 - [x] Extend model zoo
@@ -118,6 +127,7 @@ supported in opset 17.
 - [x] Add more models to model collection, try finding span prediction dataset.
 - [ ] Add model architecture for localisation task
 - [ ] Integrate feature extraction into model architecture using opset 17 and torch nightly via https://github.com/qiuqiangkong/torchlibrosa TRIED AND TESTED: WORKS FOR OPSET 17
+
 Research
 - [ ] Implement high-informational content sampling strategy; compare to vanilla strategy the fitting time and achieved metrics 
 - [ ] Representational learning autoencoder visualising embeddings via tensorbaord - build downstrain classifier based auto-encoded representation
