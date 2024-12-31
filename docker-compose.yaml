@@ -1,46 +1,63 @@
-verison: '3.8'
-
+# version: '3.8'
 services:
 
   fitting:
+    container_name: fitting_ctn
     build:
       context: ./fit
       dockerfile: Dockerfile.train
-    container_name: fitting_ctn
     volumes:
-      - output:/usr/src/app
+      - ./output:/usr/src/app/output
+      - /media/ola/Samsung_T5/data/audio/keyword-spotting:/usr/src/app/data 
     env_file:
-      - .dev.env
+      - ./fit/env_vars/resnet/.dev.env
     restart: no
-
+    command: python fit.py
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 2 # alternatively, use `count: all` for all GPUs
+              capabilities: [gpu]
 
   serving: 
+    container_name: serving_ctn
     build:
       context: ./serve
       dockerfile: Dockerfile.tensorrt 
-    container_name: serving_ctn
     volumes:
-      - output:/usr/src/app
+      - ./output:/workspace/model
     command: ./start.sh
     ports:
-      - 7000:80
+      - 6000:80
     env_file:
-      - .dev.env
-    restart_policy:
-      condition: on-failure
-      max-attempts: 3
+      - ./fit/env_vars/resnet/.dev.env
+    restart: always 
     depends_on:
+      - fitting
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 2
+              capabilities: [gpu]
 
-  
+
+
   website:
+    container_name: website_ctn
     build:
       context: ./website
-      dockerfile: dockerfile.website 
-    container_name: website_ctn
+      dockerfile: Dockerfile.website 
     volumes:
-      - db:/usr/src/app
-
-
+      - ./db:/usr/src/app
+    ports:
+      - 7000:8000
+    restart: always
+    depends_on:
+      - serving 
         
 
 
