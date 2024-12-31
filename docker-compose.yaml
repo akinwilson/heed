@@ -1,0 +1,49 @@
+verison: '3.8'
+
+services:
+
+  fitting:
+    build:
+      context: ./fit
+      dockerfile: Dockerfile.train
+    container_name: fitting_ctn
+    volumes:
+      - output:/usr/src/app
+    env_file:
+      - .dev.env
+    restart: no
+
+
+  serving: 
+    build:
+      context: ./serve
+      dockerfile: Dockerfile.tensorrt 
+    container_name: serving_ctn
+    volumes:
+      - output:/usr/src/app
+    command: ./start.sh
+    ports:
+      - 7000:80
+    env_file:
+      - .dev.env
+    restart_policy:
+      condition: on-failure
+      max-attempts: 3
+    depends_on:
+
+  
+  website:
+    build:
+      context: ./website
+      dockerfile: dockerfile.website 
+    container_name: website_ctn
+    volumes:
+      - db:/usr/src/app
+
+
+        
+
+
+
+
+
