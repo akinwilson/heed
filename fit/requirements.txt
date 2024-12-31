@@ -1,0 +1,2 @@
+pytorch-lightning==2.5.0.post0
+torch==2.5.1

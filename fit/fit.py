@@ -11,34 +11,18 @@ logger.addHandler(logging.StreamHandler())
 # only set ENV_FILE_PATH during testing
 # how can I get args.model_name.lower()
 
-parser = ArgumentParser()
-MODEL_NAMES = ["HSTAT", "ResNet", "DeepSpeech", "LeeNet", "MobileNet"]
-parser.add_argument(
-    "-m", "--model_name", type=str, default="ResNet", choices=MODEL_NAMES
-)
-args, _ = parser.parse_known_args()
-# model_name = "ResNet".lower()
-# env_filepath = os.getenv("ENVFILE_PATH", f"./env_vars/{model_name}/.dev.env")
-
-# I only know args at main function
-env_filepath = os.getenv(
-    "ENV_FILE_PATH", f"./env_vars/{args.model_name.lower()}/.dev.env"
-)
-
-logger.info(f"Loading env vars from file: {env_filepath}")
-load_dotenv(env_filepath)
 
 # import all available models
-from wwv.Architecture.ResNet.model import ResNet
-from wwv.Architecture.HTSwin.model import HTSwinTransformer
-from wwv.Architecture.DeepSpeech.model import DeepSpeech
-from wwv.Architecture.LeeNet.model import LeeNet
-from wwv.Architecture.MobileNet.model import MobileNet
+from kws.Architecture.ResNet.model import ResNet
+from kws.Architecture.HTSwin.model import HTSwinTransformer
+from kws.Architecture.DeepSpeech.model import DeepSpeech
+from kws.Architecture.LeeNet.model import LeeNet
+from kws.Architecture.MobileNet.model import MobileNet
 
-from wwv.data import AudioDataModule
-from wwv.util import OnnxExporter, CallbackCollection
-from wwv.routine import Routine
-import wwv.config as cfg
+from kws.data import AudioDataModule
+from kws.util import OnnxExporter, CallbackCollection
+from kws.routine import Routine
+import kws.config as cfg
 
 import torch.nn.functional as F
 from pytorch_lightning import Trainer
@@ -79,7 +63,7 @@ class Fitter:
         model,
         cfg_model,
         cfg,
-        data_path="/media/useraye/Samsung_T5/data/audio/keyword-spotting",
+        data_path="/usr/src/app/data",
     ) -> None:
         self.model = model
         self.cfg_model = cfg_model
@@ -215,6 +199,24 @@ class Fitter:
 
 
 def main():
+
+    parser = ArgumentParser()
+    MODEL_NAMES = ["HSTAT", "ResNet", "DeepSpeech", "LeeNet", "MobileNet"]
+    STAGES = ["dev", "test", "prod"]
+    parser.add_argument(
+        "-m", "--model_name", type=str, default="ResNet", choices=MODEL_NAMES
+    )
+    parser.add_arguemt("-s", "--stage", type=str, default="dev", choices=STAGES)
+
+    # args, _ = parser.parse_known_args()
+    args, _ = parser.parse_args()
+    # I only know args at main function
+    env_filepath = os.getenv(
+        "ENV_FILE_PATH", f"./env_vars/{args.model_name.lower()}/.{args.stage}.env"
+    )
+
+    logger.info(f"Loading env vars from file: {env_filepath}")
+    load_dotenv(env_filepath)
 
     logger.info(f"torch.cuda.is_available(): {torch.cuda.is_available()}")
     logger.info(f"Training model: {args.model_name}")

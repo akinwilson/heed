@@ -1,1 +1,15 @@
-FROM python:3.9
+FROM python:3.12
+LABEL maintainer="akinolawilson@gmail.com"
+WORKDIR /usr/src/app 
+
+RUN pip install --upgrade pip 
+COPY ./requirements.txt ./requirements.txt
+RUN pip install -r requirements.txt 
+
+COPY ./fit.py ./fit.py
+
+RUN mkdir env_vars 
+COPY ./env_vars ./env_vars
+
+
+ENTRYPOINT [ "python", "fit.py","--stage", "dev", "--model_name", "resnet"]
