@@ -2,7 +2,6 @@ Pipfile
 output/
 .ipynb_checkpoints/
 data/
-img/
 **/runs/
 lightning_logs/
 *.odp*
