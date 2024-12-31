@@ -17,4 +17,5 @@ speech_commands_v0.02.tar.gz
 .env
 app/build/
 */runs/*
+presentations/
 
