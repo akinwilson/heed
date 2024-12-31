@@ -1,5 +1,5 @@
 # heed 
-
+![]( img/heed.jpg )
 ## Overview 
 heed is a library which fits and locally deploys a collection of deep learning models trained on the task of [key-word spotting](https://en.wikipedia.org/wiki/Keyword_spotting), a server is  created whcih provides a user interface for these trained models to be queried through, using an audio input device of the host machine.
 
