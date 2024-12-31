@@ -2,9 +2,9 @@
 
 ## Date: 5rd November 2022 updates
 
-- Now have means of converting model from onnx to TFline via `TfliteConverter` in `app/src/wwv/util.py`. But it is a bit dodgy. 
+- Now have means of converting model from onnx to TFline via `TfliteConverter` in `app/src/kws/util.py`. But it is a bit dodgy. 
 
-- `OnnxExporter` in `app/src/wwv/util.py` now accepts _opset_version_ and _input_shape_ as arguments
+- `OnnxExporter` in `app/src/kws/util.py` now accepts _opset_version_ and _input_shape_ as arguments
 - Feature extraction atm in data loader pipeline. But tested with Torchlibrosa and can now export part of model with onnx opset 17
 - `../fit.py` now allows for multi-architecture training via passing command line args `--model_name MODEL_STRING` to script.
 where `MODEL_STRING` can be: 
@@ -14,7 +14,7 @@ where `MODEL_STRING` can be:
   4) LeeNet
   5) MobileNet
 
-- `app/src/wwv/routine.py` contains pytorch lightning training, validating testing loops packaging a model architecture for fitting; works for both binary classification and localisation tasks 
+- `app/src/kws/routine.py` contains pytorch lightning training, validating testing loops packaging a model architecture for fitting; works for both binary classification and localisation tasks 
 
 
 
@@ -29,7 +29,7 @@ where `MODEL_STRING` can be:
 
 
 
-## **To Dos 5rd November 2022**:
+## **To Dos 31 dec 2025**:
 
 - [ ] Include functional augmentation in the dataloader 
 
