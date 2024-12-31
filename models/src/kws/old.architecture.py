@@ -5,7 +5,7 @@ import torch.nn as nn
 
 import torch.nn.functional as F
 from transformers import AutoFeatureExtractor
-from wwv.layer import AugmentationManager, Scaler, Standardisation, ProcessingLayer
+from kws.layer import AugmentationManager, Scaler, Standardisation, ProcessingLayer
 
 
 import logging
@@ -14,6 +14,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler())
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 #######################################################################################
 # Predictor wrapper

@@ -6,7 +6,7 @@ import torch
 import torchaudio
 import logging
 import os
-from wwv.layer import Scaler
+from kws.layer import Scaler
 import copy
 
 

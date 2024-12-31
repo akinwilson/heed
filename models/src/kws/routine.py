@@ -5,7 +5,7 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 import pytorch_lightning as pl
-from wwv.eval import Metric
+from kws.eval import Metric
 
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
@@ -67,7 +67,7 @@ class Routine(pl.LightningModule):
             ).mean(),
         }
         # self.log(f"LR",self.lr, on_epoch=True, prog_bar=True, logger=True)
-        for (k, v) in results.items():
+        for k, v in results.items():
             self.log(
                 f"train_{k}",
                 v,
@@ -112,7 +112,7 @@ class Routine(pl.LightningModule):
                 [x["val_acc"] for x in self.validation_step_outputs]
             ).mean(),
         }
-        for (k, v) in results.items():
+        for k, v in results.items():
             self.log(
                 f"val_{k}", v, on_epoch=True, prog_bar=True, logger=True, sync_dist=True
             )
@@ -145,7 +145,7 @@ class Routine(pl.LightningModule):
             "acc": torch.tensor([x["test_acc"] for x in self.test_step_outputs]).mean(),
         }
 
-        for (k, v) in results.items():
+        for k, v in results.items():
             self.log(
                 f"test_{k}",
                 v,
