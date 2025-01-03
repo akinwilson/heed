@@ -4,11 +4,23 @@ LABEL maintainer="akinolawilson@gmail.com"
 WORKDIR /usr/src/app
 RUN pip install --upgrade pip 
 COPY ./requirements.txt ./requirements.txt
+# required for pyaudio to work 
+
+RUN apt update -y
+# RUN apt-get -y install portaudio19-dev
+RUN apt install -y libogg-dev libopusenc-dev libflac-dev libopusfile-dev libopus-dev libvorbis-dev
 RUN pip install -r requirements.txt 
 
+
+
+
 RUN mkdir core heed
-COPY ./core ./core 
-COPY ./heed ./heed  
-COPY ./manage.py ./ 
+COPY ./core/ ./core 
+COPY ./heed/ ./heed  
+COPY ./manage.py ./manage.py
+
+# need to run database migration 
+RUN python manage.py migrate
+
 # runs on port 8000 
 ENTRYPOINT [ "python","manage.py","runserver", "0.0.0.0:8000" ]

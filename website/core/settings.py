@@ -72,7 +72,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "core.wsgi.application"
 
 # for web-sockets
-ASGI_APPLICATION = "core.routing.application"
+ASGI_APPLICATION = "core.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
