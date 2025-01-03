@@ -1,7 +1,7 @@
 # heed 
 ![]( img/heed.jpg )
 ## Overview 
-heed is a library which fits and locally deploys a collection of deep learning models trained on the task of [key-word spotting](https://en.wikipedia.org/wiki/Keyword_spotting), a webserver is  created whcih provides a user interface for these trained models to be queried through, using an audio input device of the host machine.
+heed is a library which fits a collection of deep learning models trained on the task of [key-word spotting](https://en.wikipedia.org/wiki/Keyword_spotting) and locally deploy one via a webserver which provides a user interface for these trained models to be queried through, using an audio input device of the host machine.
 
 ##  Usage
 
@@ -109,7 +109,7 @@ Go to http://0.0.0.0:8080/docs to test out the enpoint via the swagger UI.
 
 
 
-## To do: 31 Dec 2024
+## To do: 3 Jan 2025
 - [] Figure out issue with tensorrt: https://github.com/onnx/onnx-tensorrt/issues/1009. Cannot use as execution provider at the momen
 - [] figure out how to stream audio from browser to server. followed [this tutorial](https://dev.to/deepgram/live-transcription-with-python-and-django-4aj2). 
 - [] figure out how to include the `kms` library in the fitting container. Its part of private repository so running -e  
