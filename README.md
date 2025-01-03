@@ -5,7 +5,12 @@ heed is a library which fits and locally deploys a collection of deep learning m
 
 ##  Usage
 
-To begin, clone the repository. 
+To begin, clone the repository and run a script to check that you have all the required CLI tools:
+```
+./check_cli_tools.sh
+```
+
+
 
 Unfortunately, the dataset used in this application is private. So running the entire pipeline end to end may not work with a single command for you. Nethertheless, you can used your own [binary classification](https://en.wikipedia.org/wiki/Binary_classification) dataset from the audio domain to substitute for the one used in this repository, or remove the `fitting` service from the `docker-compose.yaml` file and use a pre-trained model that accompanies this repository. 
 
@@ -20,8 +25,6 @@ docker-compose -f docker-compose.yaml up
 ## Running tests
 
 ## Further improvements 
-
-## Citation 
 
 
 # Notes for devs 
@@ -104,32 +107,22 @@ Enter the command: `../app && python main.py`
 To start the server. Obviously you can start the server with single command  
 Go to http://0.0.0.0:8080/docs to test out the enpoint via the swagger UI. 
 
-## To do: 31 Dec 2024
 
-- [x] Get one architecture working, as in fitting, and saving 
-- [x] Extend model zoo
-- [x] parameterised the feature input dimensions, and pass this to the onnx
-  exporter class during training
+
+## To do: 31 Dec 2024
+- [] Figure out issue with tensorrt: https://github.com/onnx/onnx-tensorrt/issues/1009. Cannot use as execution provider at the momen
+- [] figure out how to stream audio from browser to server. followed [this tutorial](https://dev.to/deepgram/live-transcription-with-python-and-django-4aj2). 
+- [] figure out how to include the `kms` library in the fitting container. Its part of private repository so running -e  
+
 - [ ] Review https://pytorch.org/audio/stable/_modules/torchaudio/models/wav2vec2/model.html#Wav2Vec2Model, test exporting the feature extractor of huggingface as part of the model architecture
 - [ ] Normalisation approach: apply PCEN https://github.com/daemon/pytorch-pcen
-- [x] change the output of networks to be logits let Routine function handle 
-- [x] use nn.crossEntropy with raw logits -> not needed 
-- [x] Make sure to adjust the Exporting of the model to onnx to include the correct input signature 
-- [x] Bench mark and stress test the TensorRT backend GPU (cuda) and CPU (MLAS) 
-- [x] Check back for when OpSet 17 is in stable torch, want to try to export
-  feature extraction as part of model architecture. torch.ftt ops should be
-supported in opset 17. 
-- [x] Create a presentation as to why 
 - [ ] From onnx to TFlite -> implement basic converted and test against chris
   butcher
-- [x] factor out environment variables from docker container, place in file and
-  load in at runtime docker run --env-args
-- [x] Add more models to model collection, try finding span prediction dataset.
-- [ ] Add model architecture for localisation task
 - [ ] Integrate feature extraction into model architecture using opset 17 and torch nightly via https://github.com/qiuqiangkong/torchlibrosa TRIED AND TESTED: WORKS FOR OPSET 17
 
+
+
 Research
-- [ ] Implement high-informational content sampling strategy; compare to vanilla strategy the fitting time and achieved metrics 
 - [ ] Representational learning autoencoder visualising embeddings via tensorbaord - build downstrain classifier based auto-encoded representation
 - [ ] Synthetic data generation using variational autoencoder - Train classifier on both mix, purely synthetic and purely the original dataset and compare the results 
 - [ ] Summarise the  
