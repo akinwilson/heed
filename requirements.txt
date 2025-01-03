@@ -270,7 +270,7 @@ webcolors==1.13
 webencodings==0.5.1
 websocket-client==1.6.1
 Werkzeug==2.3.6
--e git+https://github.com/akinwilson/end-to-end.git@cdd814486f1b3fe2588fc0c3df0ccfb2c1da08e2#egg=wwv&subdirectory=app
+# -e git+https://github.com/akinwilson/end-to-end.git@cdd814486f1b3fe2588fc0c3df0ccfb2c1da08e2#egg=wwv&subdirectory=app
 xxhash==3.2.0
 yarl==1.9.2
 zc.lockfile==3.0.post1
