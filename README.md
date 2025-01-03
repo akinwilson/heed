@@ -20,14 +20,16 @@ To spin up the model fitting job, model serving and webserver containers, please
 docker-compose -f docker-compose.yaml up
 ```
 
-
-
 ## Running tests
 
 ## Further improvements 
 
-
 # Notes for devs 
+-------------------------------------------------------------------------------
+
+
+# OLD README. STILL HAS AVAILABLE INFO 
+
 
 ### Create environment
 Create a virtual environment and whilst in it, run the command: 
@@ -125,4 +127,4 @@ Go to http://0.0.0.0:8080/docs to test out the enpoint via the swagger UI.
 Research
 - [ ] Representational learning autoencoder visualising embeddings via tensorbaord - build downstrain classifier based auto-encoded representation
 - [ ] Synthetic data generation using variational autoencoder - Train classifier on both mix, purely synthetic and purely the original dataset and compare the results 
-- [ ] Summarise the  
+- [ ] Is it possible to to generator a KWS alogrithm with synthetic data generation? As in, is it possibly to generate dataset for any given key-word to be stopped?   
