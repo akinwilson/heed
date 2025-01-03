@@ -1,2 +1,4 @@
 pytorch-lightning==2.5.0.post0
 torch==2.5.1
+python-dotenv==1.0.1
+-e "https://github.com/akinwilson/heed/tree/main/models"

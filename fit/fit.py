@@ -204,7 +204,7 @@ def main():
     MODEL_NAMES = ["HSTAT", "ResNet", "DeepSpeech", "LeeNet", "MobileNet"]
     STAGES = ["dev", "test", "prod"]
     parser.add_argument(
-        "-m", "--model_name", type=str, default="ResNet", choices=MODEL_NAMES
+        "-m", "--model-name", type=str, default="ResNet", choices=MODEL_NAMES
     )
     parser.add_arguemt("-s", "--stage", type=str, default="dev", choices=STAGES)
 

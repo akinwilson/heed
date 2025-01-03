@@ -6,10 +6,15 @@ RUN pip install --upgrade pip
 COPY ./requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt 
 
+# Need to install the kms library, but its in parent folder. 
+# how to add to requirement.txt
+
 COPY ./fit.py ./fit.py
 
 RUN mkdir env_vars 
 COPY ./env_vars ./env_vars
 
 
-ENTRYPOINT [ "python", "fit.py","--stage", "dev", "--model_name", "resnet"]
+ENTRYPOINT [ "python", "fit.py","--stage", "dev", "--model-name", "resnet"]
+
+
