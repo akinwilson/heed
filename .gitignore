@@ -20,3 +20,5 @@ app/build/
 presentations/
 output/
 notebooks/
+package-lock.json
+*/opus-to-pcm/*
