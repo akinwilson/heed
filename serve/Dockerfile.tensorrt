@@ -1,10 +1,11 @@
 FROM nvcr.io/nvidia/tensorrt:22.08-py3
-LABEL maintainer="Akinola Antony Wilson <akinola.wilson@sky.com>"
+LABEL maintainer="Akinola Antony Wilson <akinolawilson@gmail.com>"
 
 # Allow passing in decision threshold and model version during build of serving container.
 ARG DECISION_THRESHOLD=0.5
 ARG MODEL_VERSION="docker-env-model-version"
-ARG EXECUTION_PROVIDER="TensorrtExecutionProvider"
+ARG EXECUTION_PROVIDER="CUDAExecutionProvider" 
+# "TensorrtExecutionProvider"
 # Setting decision_threshold and model_version and env vars 
 ENV DECISION_THRESHOLD=${DECISION_THRESHOLD}
 ENV MODEL_VERSION=${MODEL_VERSION}
@@ -40,24 +41,30 @@ WORKDIR /workspace/onnx-tensorrt
 RUN mkdir build
 WORKDIR /workspace/onnx-tensorrt/build
 
-RUN cmake .. -DTENSORRT_ROOT=/workspace/tensorrt
-RUN make -j
 
-RUN export LD_LIBRARY_PATH=$PWD:$LD_LIBRARY_PATH
+# currently causing build to fail. 
+# check: https://github.com/onnx/onnx-tensorrt/issues/1009 for potential updates 
+# RUN cmake .. -DTENSORRT_ROOT=/workspace/tensorrt
+# RUN make -j
+# RUN export LD_LIBRARY_PATH=$PWD:$LD_LIBRARY_PATH
 
 WORKDIR /workspace
 
-COPY ./deploy/requirements.txt .
+COPY ./requirements.txt ./requirements.txt
 RUN pip3 --timeout=300 --no-cache-dir install -r requirements.txt
+
 
 # Copy model files
-COPY ./deploy/model /model
+# COPY ./deploy/model /model
+
+
 RUN pip3 --timeout=300 --no-cache-dir install -r requirements.txt
 # Copy app files
-COPY ./deploy/app /app
+RUN mkdir app model 
+COPY ./app /app
 
 
-COPY ./deploy/start.sh /app/start.sh
+COPY ./start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
 WORKDIR /app
