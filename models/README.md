@@ -1,6 +1,13 @@
 # Audio classification pipeline 
 
-## Date: 5rd November 2022 updates
+
+
+# Fit a model
+```
+python fit.py -m {HSTAT|ResNet|DeepSpeech|LeeNet|MobileNet}
+```
+
+## Date: 5rd November 2023 updates
 
 - Now have means of converting model from onnx to TFline via `TfliteConverter` in `app/src/kws/util.py`. But it is a bit dodgy. 
 
@@ -29,7 +36,7 @@ where `MODEL_STRING` can be:
 
 
 
-## **To Dos 31 dec 2025**:
+## **To Dos 31 dec 2024**:
 
 - [ ] Include functional augmentation in the dataloader 
 
