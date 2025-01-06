@@ -22,14 +22,14 @@
 
         {% comment %} https://dev.to/deepgram/live-transcription-with-python-and-django-4aj2 {% endcomment %}
         <script>
-            var decoder = new OpusToPCM({
+            {% comment %} var decoder = new OpusToPCM({
                 channels: 1
              })
              
              decoder.on('decode' function(pcmData) {
                 socket.send(pcmData);
              })
-             
+              {% endcomment %}
             navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
                 if (!MediaRecorder.isTypeSupported('audio/webm'))
                     return alert('Browser not supported')
@@ -48,9 +48,7 @@
                     console.log({ event: 'onopen' })
                     mediaRecorder.addEventListener('dataavailable', async (event) => {
                         if (event.data.size > 0 && socket.readyState == 1) {
-                            var = data new Unit16Array(event.data)
-                            decoder.decode(data)
-
+                            socket.send(event.data)
                         }
                 })
                 mediaRecorder.start(1000)
@@ -134,8 +132,8 @@
            
  
          </script>
-         {% load static %}
-         <script src= "{% static 'js/opus-to-pcm/dist/opus_to_pcm.js' %}"></script>
+         {% comment %} {% load static %}
+         <script src= "{% static 'js/opus-to-pcm/dist/opus_to_pcm.js' %}"></script> {% endcomment %}
          {% comment %} <script src="./opus-to-pcm/dist/opus_to_pcm.js"></script> {% endcomment %}
     </body>
 </html>
