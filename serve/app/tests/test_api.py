@@ -18,13 +18,12 @@ def test_main_predict(client):
     """
     Test predction response
     """
+    with open("../base64audio_label_1", "rb") as f:
+        example = f.read()
 
     headers = {}
     body = {
-        "sepal_length": 3.1,
-        "sepal_width": 3.5,
-        "petal_length": 3.4,
-        "petal_width": 3
+        "content": example,
     }
 
     response = client.post("/api/v1/predict",
