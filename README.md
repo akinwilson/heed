@@ -85,7 +85,7 @@ You will have a directory produces called `/output` in the root directory of the
 
 ### Building deployment container
 
-To Build the image locally run:
+To Build the image locally run: THIS IS CURRENTLY FAILING: [SEE HERE]https://stackoverflow.com/questions/79325937/audio-stream-how-to-decode-opus-format-being-streamed-from-browser-to-server)
 `docker build . -f deploy/Dockerfile.tensorrt -t serve:latest`
 
 To deploy the image and test the endpoint, run:
@@ -112,7 +112,9 @@ Go to http://0.0.0.0:8080/docs to test out the enpoint via the swagger UI.
 
 
 ## To do: 3 Jan 2025
-- [] Figure out issue with tensorrt: https://github.com/onnx/onnx-tensorrt/issues/1009. Cannot use as execution provider at the momen
+- [] You need to be able to run the entire pipeline with docker-compose. The issue that is currently persisting is the decoding of the [opus]() which you are currently tracking via [here](https://stackoverflow.com/questions/79325937/audio-stream-how-to-decode-opus-format-being-streamed-from-browser-to-server)
+
+- [] Figure out issue with tensorrt: you are currently tracking this issue via [here](https://github.com/onnx/onnx-tensorrt/issues/1009). Cannot use as execution provider CUDA, but not tensorrt for the speed up of merging the weights and biases. 
 - [] figure out how to stream audio from browser to server. followed [this tutorial](https://dev.to/deepgram/live-transcription-with-python-and-django-4aj2). 
 - [] figure out how to include the `kms` library in the fitting container. Its part of private repository so running -e  
 
