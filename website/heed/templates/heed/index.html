@@ -41,7 +41,6 @@
                 })
     
                 const socket = new WebSocket('ws://localhost:8000/listen')
-                socket.binaryType = 'arraybuffer'
                  
                 socket.onopen = () => {
                     document.querySelector('#status').textContent = 'Connected'
@@ -51,7 +50,8 @@
                             socket.send(event.data)
                         }
                 })
-                mediaRecorder.start(1000)
+                mediaRecorder.start(10)
+                
                 }
     
                 socket.onmessage = (message) => {
