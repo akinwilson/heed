@@ -5,6 +5,7 @@ definition
 Have created model dataclasses to tried to isolated factors of concerns on per model basis 
 Note, there is overlap in attributes at the moment amongst the data classes. 
 """
+
 import os
 import numpy as np
 from pathlib import Path
@@ -35,9 +36,11 @@ class Fitting:
     )
     dev_run: bool = field(default=False if os.getenv("DEV_RUN") == "0" else True)
     resume_from_checkpoint: str = field(
-        default=None
-        if os.getenv("RESUME_FROM_CHECKPOINT") == "None"
-        else os.getenv("RESUME_FROM_CHECKPOINT")
+        default=(
+            None
+            if os.getenv("RESUME_FROM_CHECKPOINT") == "None"
+            else os.getenv("RESUME_FROM_CHECKPOINT")
+        )
     )
     train_bs: int = int(os.getenv("TRAIN_BATCH_SIZE", 32))
     val_bs: int = int(os.getenv("VAL_BATCH_SIZE", 32))
@@ -50,7 +53,7 @@ class CNNAE:
 
     audio_feature: str = os.getenv("AUDIO_FEATURE", "pmc")
     model_name: str = os.getenv("MODEL_NAME", "CNNAE")
-    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
+    model_dir: str = os.getenv("MODEL_DIR", "~/Code/heed/output/model")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -61,7 +64,7 @@ class CVCNNAE:
 
     audio_feature: str = os.getenv("AUDIO_FEATURE", "pmc")
     model_name: str = os.getenv("MODEL_NAME", "CVCNNAE")
-    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
+    model_dir: str = os.getenv("MODEL_DIR", "~/Code/heed/output/model")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -72,7 +75,7 @@ class SSCNNAE:
 
     audio_feature: str = os.getenv("AUDIO_FEATURE", "pmc")
     model_name: str = os.getenv("MODEL_NAME", "SSCNNAE")
-    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
+    model_dir: str = os.getenv("MODEL_DIR", "~/Code/heed/output/model")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -82,7 +85,7 @@ class AEClassifier:
     """Dense example classifier"""
 
     model_name: str = os.getenv("MODEL_NAME", "AE_Classifier")
-    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
+    model_dir: str = os.getenv("MODEL_DIR", "~/Code/heed/output/model")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
     audio_feature: str = os.getenv("AUDIO_FEATURE", "pcm")
@@ -102,7 +105,7 @@ class ResNet:
     dropout: float = float(os.getenv("DROPOUT", 0.1))
     audio_feature: str = os.getenv("AUDIO_FEATURE", "mfcc")
     model_name: str = os.getenv("MODEL_NAME", "ResNet")
-    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
+    model_dir: str = os.getenv("MODEL_DIR", "~/Code/heed/output/model")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -123,7 +126,7 @@ class HTSwin:
     model_name: str = os.getenv("MODEL_NAME", "HSTAT")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 17))
-    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
+    model_dir: str = os.getenv("MODEL_DIR", "~/Code/heed/output/model")
 
 
 @dataclass
@@ -132,7 +135,7 @@ class DeepSpeech:
 
     audio_feature: str = os.getenv("AUDIO_FEATURE", "mfcc")
     model_name: str = os.getenv("MODEL_NAME", "DeepSpeech")
-    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
+    model_dir: str = os.getenv("MODEL_DIR", "~/Code/heed/output/model")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -150,7 +153,7 @@ class LeeNet:
     )
     model_name: str = os.getenv("MODEL_NAME", "LeeNet")
     dropout: float = float(os.getenv("DROPOUT", 0.1))
-    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
+    model_dir: str = os.getenv("MODEL_DIR", "~/Code/heed/output/model")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -161,7 +164,7 @@ class MobileNet:
 
     audio_feature: str = os.getenv("AUDIO_FEATURE", "mfcc")
     model_name: str = os.getenv("MODEL_NAME", "MobileNet")
-    model_dir: str = os.getenv("MODEL_DIR", "/home/useraye/Code/pytorch/output/model")
+    model_dir: str = os.getenv("MODEL_DIR", "~/Code/heed/output/model")
     max_sample_len: int = int(os.getenv("MAX_SAMPLE_LEN", 32000))
     onnx_op_set: int = int(os.getenv("ONNX_OP_SET", 12))
 
@@ -295,8 +298,8 @@ class DataPath:
 # 75 *  0.02 / 16000 = a
 
 
-# MODEL_DIR = "/home/useraye/Code/pytorch/output/model"  # location of root outputs
-# DATA_DIR = "/home/useraye/Code/pytorch/dataset/keywords" # root location of meta training data csv files
+# MODEL_DIR = "~/Code/pytorch/output/model"  # location of root outputs
+# DATA_DIR = "~/Code/pytorch/dataset/keywords" # root location of meta training data csv files
 # LR_RANGE = [1e-1, 1e-2, 1e-3, 1e-4, 1e-5][1]
 # BATCH_SIZE_RANGE = [1,2,16, 32, 64, 128, 256][2]
 # EPOCH_RANGE = [1, 10, 30, 50, 100, 1000][1]
