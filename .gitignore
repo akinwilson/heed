@@ -22,3 +22,4 @@ output/
 notebooks/
 package-lock.json
 **/opus-to-pcm/
+**/kws.egg-info/
