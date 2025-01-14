@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
@@ -13,115 +15,31 @@
         <link rel="stylesheet" href="">
     </head>
     <body>
+        {% load static %}
+        <script type="text/javascript" src="{% static 'js/recorderWorker.js' %}"> </script>
+        <fieldset><legend>RECORD AUDIO</legend>
+    		<input onclick="startRecording()" type="button" value="start recording" />
+    		<input onclick="stopRecording()" type="button" value="stop recording and play" />
+        </fieldset>
+        
+        
+        
+        
         <h1>Key-word spotting on an audio stream</h1>
         <p id="status"> Connection status will go here</p>
         <p id="spot-plot"></p> 
         <img src="data:image/png;base64,{{ image_uri }}" id="prediction_barchart_id"> 
+        
+        <!-- <form method="post" action="/upload" enctype="multipart/form-data">
+            <label>Audio File: </label>
+            <input type="file" name="user_audio"/>
+            <br>
+            <input value="Upload" type="submit">
+          </form> -->
 
-        <script>
-            navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-                if (!MediaRecorder.isTypeSupported('audio/webm'))
-                    return alert('Browser not supported')
-    
-                const mediaRecorder = new MediaRecorder(stream, {
-                    audioBitsPerSecond: 256000,
-                    mimeType: 'audio/webm;codecs=opus',
-
-                })
-    
-                const socket = new WebSocket('ws://localhost:8000/listen')
-                 
-                socket.onopen = () => {
-                    document.querySelector('#status').textContent = 'Connected'
-                    console.log({ event: 'onopen' })
-                    mediaRecorder.addEventListener('dataavailable', async (event) => {
-                        if (event.data.size > 0 && socket.readyState == 1) {
-                            socket.send(event.data)
-                        }
-                })
-                mediaRecorder.start(10)
-                }
-    
-                socket.onmessage = (message) => {
-                    const received = message.data
-                    if (received) {
-                        console.log(received)
-                        document.querySelector('#prediction_barchart_id').src= "data:image/png;base64," + received
-                    }
-               }
-    
-               socket.onclose = () => {
-                console.log({ event: 'onclose' })
-            }
-    
-                socket.onerror = (error) => {
-                    console.log({ event: 'onerror', error })
-                }
-    
-               })
- 
-               
-
-
-
-{% comment %} 
-
-
-            navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-             if (!MediaRecorder.isTypeSupported('audio/webm'))
-                 return alert('Browser not supported')
-            
-             const options = {
-                audioBitsPerSecond: 256000,
-                mimeType: 'audio/webm;codecs=opus',
-                         }
-            
-             var mediaRecorder = new MediaRecorder(stream, options)
-            })
-
-             var socket = new WebSocket('ws://localhost:8000/listen')
-             socket.binaryType = 'arraybuffer'
-
-
-
-
-             socket.onopen = () => {
-                 document.querySelector('#status').textContent = 'Connected'
-                 
-                 console.log({ event: 'onopen' })
-
-                 mediaRecorder.addEventListener('dataavailable', async (event) => {
-                     if (event.data.size > 0 && socket.readyState == 1) {
-                         var = data new Unit16Array(event.data)
-                         decoder.decode(data)
-                         socket.send(event.data)
-                     }
-             })
-             mediaRecorder.start(1000) // number of milliseconds to send in batchs. Align this with model who has expection on input length             
-             
-             }
- 
-             socket.onmessage = (message) => {
-                 const received = message.data
-                 if (received) {
-                     console.log(received)
-                     document.querySelector('#prediction_barchart_id').src= "data:image/png;base64," + received
-                 }
-            }
- 
-            socket.onclose = () => {
-             console.log({ event: 'onclose' })
-         }
- 
-             socket.onerror = (error) => {
-                 console.log({ event: 'onerror', error })
-             }
-  {% endcomment %}
-           
- 
+          
+        <script> 
          </script>
-         {% comment %} {% load static %}
-         <script src= "{% static 'js/opus-to-pcm/dist/opus_to_pcm.js' %}"></script> {% endcomment %}
-         {% comment %} <script src="./opus-to-pcm/dist/opus_to_pcm.js"></script> {% endcomment %}
-    </body>
+
+         </body>
 </html>

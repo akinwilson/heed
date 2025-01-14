@@ -35,6 +35,11 @@ def plot(audio_bytes=None, c=plt_colours[1]):
 #         yield t.render(c)
 
 
+def upload(request):
+    print(request)
+    if request.POST:
+        print(request)
+
 def index(request):
     image_url = "https://wcs.smartdraw.com/chart/img/basic-bar-graph.png?bn=15100111801"
     return render(

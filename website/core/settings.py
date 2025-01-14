@@ -29,9 +29,8 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
+    # "channels",
 INSTALLED_APPS = [
-    "channels",
     "heed",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -72,7 +71,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "core.wsgi.application"
 
 # for web-sockets
-ASGI_APPLICATION = "core.asgi.application"
+# ASGI_APPLICATION = "core.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -119,7 +118,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",  ] 
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

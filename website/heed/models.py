@@ -1,3 +1,8 @@
 from django.db import models
 
 # Create your models here.
+
+
+class Audio(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    recording = models.FileField()
