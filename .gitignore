@@ -23,4 +23,4 @@ notebooks/
 package-lock.json
 **/opus-to-pcm/
 **/kws.egg-info/
-**/db.sqlite3/
+**/db.sqlite3
