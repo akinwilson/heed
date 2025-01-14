@@ -22,7 +22,7 @@ def plot(audio_bytes=None, c=plt_colours[1]):
     buf.seek(0)
     string = base64.b64encode(buf.read())
     uri = urllib.parse.quote(string)
-    print("plot() VIEWS: ", uri)
+    # print("plot() VIEWS: ", uri)
     return uri
 
 
