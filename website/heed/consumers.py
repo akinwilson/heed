@@ -60,6 +60,9 @@ def plot(audio_bytes=None, c=random.sample(plt_colours, k=1)[0]):
 # )
 from pyogg import OpusDecoder
 import pyogg
+import json
+import numpy as np
+from pathlib import Path
 
 
 class KWSConsumer(AsyncWebsocketConsumer):
@@ -70,24 +73,40 @@ class KWSConsumer(AsyncWebsocketConsumer):
     async def receive(self, bytes_data):
         # https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Audio_codecs#opus
         # print("raw_btyes: ", bytes_data)
-        odecoder = OpusDecoder()
-        odecoder.set_channels(1)
-        odecoder.set_sampling_frequency(16_000)
-        # print(dir(odecoder))
-        try:
-            print("Decoded bytes: ", odecoder.decode(bytes_data))
-        except pyogg.pyogg_error.PyOggError:
-            print("Corrupted stream apparently")
-            pass
+        print("bytes_data", bytes_data)
+        with open(Path(__file__).parent / "testing.ogg", "ab") as f:
+            f.write(bytes_data)
+            print("written file")
+        # odecoder = OpusDecoder()
+        # odecoder.set_sampling_frequency(48_000)
+        # odecoder.set_channels(1)
+        # print("dir(odecoder) ", dir(odecoder))
+
+        # try:
+        #     result = odecoder.decode(bytes_data)
+        #     print("np.asarray(result): ", np.asarray(result).shape)
+        # except pyogg.pyogg_error.PyOggError:
+        #     print("Decoding with missing packets")
+        #     # result = odecoder.decode_missing_packet(bytes_data)
+        # print("result.shape", result.shape)
+        # # print(result)
+        # print("dir(result) ", dir(result))
+
+        # try:
+        #     print("Decoded bytes: ", result)
+        # except pyogg.pyogg_error.PyOggError:
+        #     print("Corrupted stream apparently")
+        #     pass
+
         # data = stream_parser.read(bytes_data)
         # print("Array: ", array)
         # print(f"pyaudio data: {data}")
         # sample = np.frombuffer(bytes_data, dtype=np.float32)  # np.int16)
-        print(f"len of bytes: {len(bytes_data)}")
+        # print(f"len of bytes: {len(result)}")
         # print("np array: ", sample.shape)
-
+        # import array
+        # arr
         # self.send(bytes_data)
-
         # self.send(text_data=BLUE_PLOT_B64)
 
     async def get_spot_result(self, data):
