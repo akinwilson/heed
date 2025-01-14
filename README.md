@@ -15,7 +15,7 @@ To begin, clone the repository and run a script to check that you have all the r
 Unfortunately, the dataset used in this application is private. So running the entire pipeline end to end may not work with a single command for you. Nethertheless, you can used your own [binary classification](https://en.wikipedia.org/wiki/Binary_classification) dataset from the audio domain to substitute for the one used in this repository, or remove the `fitting` service from the `docker-compose.yaml` file and use a pre-trained model that accompanies this repository. 
 
 
-To spin up the model fitting job, model serving and webserver containers, please run:
+To spin up the model fitting job, serving and web server containers, please run:
 ```
 docker-compose -f docker-compose.yaml up
 ```
@@ -111,7 +111,9 @@ Go to http://0.0.0.0:8080/docs to test out the enpoint via the swagger UI.
 
 
 
-## To do: 3 Jan 2025
+## To do: 14 Jan 2025
+- [] Containerise the fitting of the models and make sure access is provided. 
+- [] allow uploading 1 second media files to django and return predictions
 - [] You need to be able to run the entire pipeline with docker-compose. The issue that is currently persisting is the decoding of the [opus]() which you are currently tracking via [here](https://stackoverflow.com/questions/79325937/audio-stream-how-to-decode-opus-format-being-streamed-from-browser-to-server)
 
 - [] Figure out issue with tensorrt: you are currently tracking this issue via [here](https://github.com/onnx/onnx-tensorrt/issues/1009). Cannot use as execution provider CUDA, but not tensorrt for the speed up of merging the weights and biases. 
