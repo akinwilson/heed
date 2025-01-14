@@ -18,18 +18,7 @@
         <p id="spot-plot"></p> 
         <img src="data:image/png;base64,{{ image_uri }}" id="prediction_barchart_id"> 
 
-
-
-        {% comment %} https://dev.to/deepgram/live-transcription-with-python-and-django-4aj2 {% endcomment %}
         <script>
-            {% comment %} var decoder = new OpusToPCM({
-                channels: 1
-             })
-             
-             decoder.on('decode' function(pcmData) {
-                socket.send(pcmData);
-             })
-              {% endcomment %}
             navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
                 if (!MediaRecorder.isTypeSupported('audio/webm'))
                     return alert('Browser not supported')
@@ -51,7 +40,6 @@
                         }
                 })
                 mediaRecorder.start(10)
-                
                 }
     
                 socket.onmessage = (message) => {
