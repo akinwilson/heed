@@ -1,4 +1,9 @@
 
+<!-- 
+FOLLOWING THIS:  
+https://stackoverflow.com/questions/16413063/html5-record-audio-to-file 
+-->
+
 
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
@@ -22,7 +27,43 @@
     		<input onclick="stopRecording()" type="button" value="stop recording and play" />
         </fieldset>
         
-        
+        <script>
+            var onFail = function(e) {
+                console.log('Rejected!', e);
+            };
+
+            var onSuccess = function(s) {
+                var context = new webkitAudioContext();
+                var mediaStreamSource = context.createMediaStreamSource(s);
+                recorder = new Recorder(mediaStreamSource);
+                recorder.record();
+
+                // audio loopback
+                // mediaStreamSource.connect(context.destination);
+            }
+
+            window.URL = window.URL || window.webkitURL;
+            navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+            var recorder;
+            var audio = document.querySelector('audio');
+
+            function startRecording() {
+                if (navigator.getUserMedia) {
+                    navigator.getUserMedia({audio: true}, onSuccess, onFail);
+                } else {
+                    console.log('navigator.getUserMedia not present');
+                }
+            }
+
+            function stopRecording() {
+                recorder.stop();
+                recorder.exportWAV(function(s) {
+                            
+                                 audio.src = window.URL.createObjectURL(s);
+                });
+            }
+        </script>       
         
         
         <h1>Key-word spotting on an audio stream</h1>
@@ -36,10 +77,5 @@
             <br>
             <input value="Upload" type="submit">
           </form> -->
-
-          
-        <script> 
-         </script>
-
          </body>
 </html>
