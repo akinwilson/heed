@@ -79,7 +79,33 @@ if (navigator.mediaDevices.getUserMedia) {
       chunks = [];
       const audioURL = window.URL.createObjectURL(blob);
       audio.src = audioURL;
+      console.log(audioURL);
       console.log("recorder stopped");
+
+      $.ajax({
+        type: "POST",
+        credentials: "include",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        // this works for local deployment, deploying django server locally
+        url: "http://localhost:8000/upload/",
+        data: {
+          audio_file: audio.src,
+          action: "post",
+        },
+        success: function (json) {
+          document.getElementById(
+            "prediction_barchart"
+          ).src = `data:image/png;base64,${json["image_uri"]}`;
+          image_uri;
+        },
+        error: function (xhr, errmsg, err) {
+          console.log("error");
+          console.log(xhr);
+          console.log(errmsg);
+        },
+      });
 
       deleteButton.onclick = function (e) {
         e.target.closest(".clip").remove();
