@@ -10,6 +10,7 @@ speech_commands_v0.02.tar.gz
 *.ckpt
 *.onnx
 *.pt
+*old.*
 *__pycache__*
 /dataset
 .~lock.reducing-inference-time.odp#
