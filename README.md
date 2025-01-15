@@ -49,19 +49,21 @@ You will have a directory produces called `/output` in the root directory of the
 
 ### Building serving container
 
-To Build the image locally run: THIS IS CURRENTLY FAILING: [SEE HERE]https://stackoverflow.com/questions/79325937/audio-stream-how-to-decode-opus-format-being-streamed-from-browser-to-server)
-`docker build . -f deploy/Dockerfile.tensorrt -t serve:latest`
+To Build the image locally run: THIS IS CURRENTLY FAILING: [SEE HERE](https://github.com/onnx/onnx-tensorrt/issues/1009)
+
+```
+docker build . -f serve/Dockerfile.tensorrt -t serve:latest
+```
 
 To deploy the image and test the endpoint, run:
 
-
- `docker run --gpus all -p 8080:80 -e "WORKERS=1" -e "EXECUTION_PROVIDER=TensorrtExecutionProvider"  --name="rt_test" -it serve:latest`
+```
+docker run --gpus all -p 8080:80 -e "WORKERS=1" -e "EXECUTION_PROVIDER=TensorrtExecutionProvider"  --name="rt_test" -it serve:latest
+```
  
-
-
 **Note** You will need to move a `model.onnx` into the `/deploy/model` directory if you wish to deploy a model. 
 
-Running the image iteractively 
+#### Running the image iteractively 
 
 `docker run --gpus all -p 8080:8080 -it serve:latest /bin/bash`
 
