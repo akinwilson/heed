@@ -18,7 +18,7 @@ docker-compose -f docker-compose.yaml up
 ```
 
 ## Running tests
-heed has made up of three components; the `fitting`, `serving` and `webserver` parts. Each of these has its own suite of tests which can be run via:
+heed has three components; the `fitting`, `serving` and `webserver` parts. Each of these has its own suite of tests which can be run via:
 ```
 
 ```
