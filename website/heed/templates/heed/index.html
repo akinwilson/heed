@@ -28,12 +28,14 @@ https://stackoverflow.com/questions/16413063/html5-record-audio-to-file
         </fieldset>
         
         <script>
+            window.AudioContext = window.AudioContext || window.webkitAudioContext;
+
             var onFail = function(e) {
                 console.log('Rejected!', e);
             };
 
             var onSuccess = function(s) {
-                var context = new webkitAudioContext();
+                var context = new AudioContext();
                 var mediaStreamSource = context.createMediaStreamSource(s);
                 recorder = new Recorder(mediaStreamSource);
                 recorder.record();
@@ -62,6 +64,7 @@ https://stackoverflow.com/questions/16413063/html5-record-audio-to-file
                             
                                  audio.src = window.URL.createObjectURL(s);
                 });
+
             }
         </script>       
         

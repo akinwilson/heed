@@ -1,5 +1,4 @@
 (function (window) {
-
   var WORKER_PATH = 'recorderWorker.js';
   var Recorder = function (source, cfg) {
     var config = cfg || {};
@@ -26,7 +25,7 @@
         ]
       });
     }
-
+    console.log("Hello!");
     this.configure = function (cfg) {
       for (var prop in cfg) {
         if (cfg.hasOwnProperty(prop)) {
@@ -34,4 +33,4 @@
         }
       }
     }
-  })
+  }})
