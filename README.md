@@ -18,9 +18,13 @@ docker-compose -f docker-compose.yaml up
 ```
 
 ## Running tests
+heed has made up of three components; the `fitting`, `serving` and `webserver` parts. Each of these has its own suite of tests which can be run via:
+```
 
+```
 
 ## Further improvements 
+The frontend HTML and CSS for recording and posting an audio file to the backend could be improved upon. At the moment, its very bare.
 
 ## Notes for devs 
 
