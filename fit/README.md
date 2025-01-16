@@ -20,7 +20,7 @@ docker build . -f Dockerfile.train -t fit:latest
 
 ### Running container
 
-Next, we want to mount the volumes for inputs (training data) and outputs (model artefacts) that the fitting routine will use throughout its process. **NOTE**: we call `$(pwd)` in the bellow command which means the `volume` will be dependent on where this command is executed. So move up one level to the root of this repository and run:
+Next, we want to mount the volumes for inputs (training data) and outputs (model artefacts) that the fitting routine will use throughout its process. **NOTE**: we call `$(pwd)` in the below command which means the `volume` will be dependent on where this command is executed. So move up one level to the root of this repository and run the following command. This is such that there is alignment between where the serving container will look to find model artefacts, i.e. `/output` directory, which will be mounted as a volume to the serving container. See the `docker-compose.yaml` file for the collective setup.
 
 ```
 docker run --name fit --rm -it -v $(pwd)/output:/usr/src/app/output -v /media/$(whoami)/Samsung_T5/data/audio/keyword-spotting:/usr/src/app/data fit:latest /bin/bash
