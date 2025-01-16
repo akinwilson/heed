@@ -206,11 +206,12 @@ def main():
     parser.add_argument(
         "-m", "--model-name", type=str, default="ResNet", choices=MODEL_NAMES
     )
-    parser.add_arguemt("-s", "--stage", type=str, default="dev", choices=STAGES)
+    parser.add_argument("-s", "--stage", type=str, default="dev", choices=STAGES)
 
     # args, _ = parser.parse_known_args()
-    args, _ = parser.parse_args()
+    args = parser.parse_args()
     # I only know args at main function
+    
     env_filepath = os.getenv(
         "ENV_FILE_PATH", f"./env_vars/{args.model_name.lower()}/.{args.stage}.env"
     )
