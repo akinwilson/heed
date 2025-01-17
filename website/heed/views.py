@@ -15,12 +15,12 @@ plt_colours = ["b", "g", "r", "c", "m", "y"]
 
 
 def plot_bar(prob=0.75):
-    fig, ax = plt.suplots()
+    fig, ax = plt.subplots()
     x = ['Keyword', 'Not keyword']
     h = [prob, 1-prob]
     ax.bar(x,h)
     buffer = io.BytesIO()
-    fig.savefig(buffer, "png")
+    fig.savefig(buffer, format="png")
     buffer.seek(0)
     plot_encoded = base64.b64decode(buffer.read())
     uri = urllib.parse.quote(plot_encoded)
@@ -50,20 +50,24 @@ def plot(audio_bytes=None, c=plt_colours[1]):
 
 
 def upload(request):
-    print(request.__dict__)
     if request.method == "POST":
-        if request.FILES.get("audio_file", False):
-            file = request.FILES['audio_file']
+        if request.FILES.get("audio", False):
+            file = request.FILES['audio']
             print(f"file:{file}")
+            print("file.file", file.file)
+            import numpy as np 
+            audio_samples = np.frombuffer(file.file, dtype=np.int16)
+
+            print("file.__dict__",file.__dict__ )
 
     
     return JsonResponse({'image_uri':plot_bar()}) 
     
 def index(request):
-    image_url = "https://wcs.smartdraw.com/chart/img/basic-bar-graph.png?bn=15100111801"
-    return render(
-        request, "heed/index2.html", {"image_uri": plot()}
-    )  # HttpResponse("First response")
+    print("hello")
+    return render(request, "heed/index3.html") # , {"image_uri": plot()}
+
+    # )  # HttpResponse("First response")
 
 
 # def index(request):

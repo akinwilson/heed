@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Audio Streaming</title>
+    <!-- Add Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-KyZXEJ6S7h4R1pF7Yk6jgd3jATKKfNoxN9W1E0fXjWq2RPzY2L8E8rUE10eVQ6g8"
+      crossorigin="anonymous"
+    />
+    <style>
+      body,
+      html {
+        height: 100%;
+      }
+      .centered-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        flex-direction: column;
+        text-align: center;
+      }
+      canvas {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid centered-container">
+      <h1>Keyword Spotting</h1>
+      <button id="startBtn" class="btn btn-success btn-lg mb-2">
+        Start Streaming
+      </button>
+      <button id="stopBtn" class="btn btn-danger btn-lg mb-2" disabled>
+        Stop Streaming
+      </button>
+      <canvas id="waveformCanvas" width="800" height="400"></canvas>
+    </div>
+
+    <!-- Add Bootstrap JS (optional, for future enhancements) -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+      integrity="sha384-oBqDVmMz4fnFO9gybP2Mv0wSt+6ExgflKTx4+q6ggg1dA4brXXO/fnUqjPp1/WE4"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"
+      integrity="sha384-GLhlTQ8iRAB6E4QXG0vR4t0gfuFjGo6cpz6g3g9tV18mx1U7q8GFCfw7kWv6a5zX"
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      let socket;
+      let mediaRecorder;
+      let audioChunks = [];
+
+      document
+        .getElementById("startBtn")
+        .addEventListener("click", startRecording);
+      document
+        .getElementById("stopBtn")
+        .addEventListener("click", stopRecording);
+
+      async function startRecording() {
+        // Disable the Start button and enable the Stop button
+        document.getElementById("startBtn").disabled = true;
+        document.getElementById("stopBtn").disabled = false;
+
+        // Initialize WebSocket connection
+        socket = new WebSocket("ws://" + window.location.host + "/ws/audio/");
+
+        socket.onopen = function () {
+          console.log("Connected to WebSocket");
+        };
+
+        socket.onmessage = function (event) {
+          let message = JSON.parse(event.data);
+          if (message.plot) {
+            let img = new Image();
+            img.onload = function () {
+              const canvas = document.getElementById("waveformCanvas");
+              const ctx = canvas.getContext("2d");
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(img, 0, 0);
+            };
+            img.src = "data:image/png;base64," + message.plot;
+          }
+        };
+
+        // Get access to the microphone
+        let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.ondataavailable = function (event) {
+          audioChunks.push(event.data);
+          let audioBlob = new Blob(audioChunks, { type: "audio/mpeg" });
+          audioChunks = [];
+          audioBlob.arrayBuffer().then((buffer) => {
+            socket.send(JSON.stringify({ audio_data: buffer }));
+          });
+        };
+
+        mediaRecorder.start(100); // Collect audio every 100ms
+      }
+
+      function stopRecording() {
+        // Stop recording and WebSocket
+        mediaRecorder.stop();
+        socket.close();
+
+        // Enable the Start button and disable the Stop button
+        document.getElementById("startBtn").disabled = false;
+        document.getElementById("stopBtn").disabled = true;
+      }
+    </script>
+  </body>
+</html>
