@@ -3,15 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Audio Recorder</title>
+    <title>Heed</title>
     <style>
+      img {
+        translate: -160px;
+      }
+
+      table {
+        visibility :hidden; 
+      }
+
       div {
         position: absolute;
-        top: 50%;
-        left: 50%;
+        top: 10%;
+        left: 45%;
         margin-top: -50px;
         margin-left: -50px;
-        width: 100px;
+        width: 400px;
         height: 100px;
       }
       #recordButton {
@@ -31,10 +39,32 @@
   </head>
   <body>
     <div id="main">
+      <h1>heed</h1>
+      <p>Say <it>'Hello Akin'</it> </p>
       <button id="recordButton">Start Recording</button>
       <!-- <button id="deleteButton" style="display: none">Delete Recording</button> -->
       <audio id="audioPlayer" controls style="display: none"></audio>
       <!-- <img id="predictions" src="" /> -->
+      
+      <table id="results">
+        <thead>
+          <tr>
+            <th scope="col">Event</th>
+            <th scope="col">Probability</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Keyword</th>
+            <td>0.22</td>
+          </tr>
+          <tr>
+            <th scope="row">Not keyword</th>
+            <td>0.78</td>
+          </tr>
+        </tfoot>
+      </table>
+
       <img
       src=""
       id="predictions"
@@ -126,6 +156,8 @@
               // let img = new Image();
               // img.onload = function () {
               img = document.getElementById("predictions");
+              table = document.getElementById("results"); 
+              table.style.visibility = 'visible';
               // const ctx = canvas.getContext("2d");
               // ctx.clearRect(0, 0, canvas.width, canvas.height);
               // ctx.drawImage(img, 0, 0);
