@@ -84,7 +84,7 @@ to test out the enpoint via the swagger UI.
 
 
 ## To do: 14 Jan 2025
-- [ ] develop frontend javascript to use mediaRecorder in browser to recorder 1.5 seconds of audio to send to backend service serving kws model. 
+- [x] develop frontend javascript to use mediaRecorder in browser to recorder 1.5 seconds of audio to send to backend service serving kws model. 
 - [ ] Containerise the fitting of the models and make sure access is provided. 
 - [ ] You need to be able to run the entire pipeline with docker-compose. The issue that is currently persisting is the decoding of the [opus]() which you are currently tracking via [here](https://stackoverflow.com/questions/79325937/audio-stream-how-to-decode-opus-format-being-streamed-from-browser-to-server)
 
