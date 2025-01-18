@@ -16,6 +16,17 @@ To spin up the model fitting job, serving and web server containers, please run:
 ```
 docker-compose -f docker-compose.yaml up
 ```
+once the fitting job has been completed (which should be apparent from the logs), the serving container will have a [interactive API documentation page](https://fastapi.tiangolo.com/features/#based-on-open-standards) accessible for end users to test out the inference API directly. This will be accessible from:
+
+```
+http://localhost:6000/docs
+```
+there will also be a webserver serving an application allowing end users to test out the inference API via recording their own clips and posting them to the API through a simple user interface. This will be accessible from:
+```
+http://localhost:7000
+```
+
+
 
 ## Running tests
 heed has three components; the `fitting`, `serving` and `webserver` parts. Each of these has its own suite of tests which can be run via:
@@ -24,11 +35,12 @@ heed has three components; the `fitting`, `serving` and `webserver` parts. Each 
 ```
 
 ## Further improvements 
-The frontend HTML and CSS for recording and posting an audio file to the backend could be improved upon. At the moment, its very bare.
+Expanding the model zoo. Websockets for real-time stream predictions. see `website/dev.README.md`
 
 ## Notes for devs 
+See the `dev.README.md`s in each subfolder; `models/`, `website/` and `serve/`, for more information. 
 
-### Create environment
+### Create environment for model development. 
 To develop the zoo of models available, create a virtual environment and whilst in it, run the command: 
 `pip install -r requirements.txt` 
 and then 
@@ -39,62 +51,23 @@ import kws
 ...
 ```
 
-
-
-### Building fitting container 
-
-Fit a model via running the script:
-
-`fit.py`
-
-
-You will have a directory produces called `/output` in the root directory of the repository. In there you will find the `model.onnx` that is needed to be placed into the `/deploy/model` directory, for the deployment to work. 
-
-
-### Building serving container
-
-To Build the image locally run: THIS IS CURRENTLY FAILING: [SEE HERE](https://github.com/onnx/onnx-tensorrt/issues/1009)
-
-```
-docker build . -f serve/Dockerfile.tensorrt -t serve:latest
-```
-
-To deploy the image and test the endpoint, run:
-
-```
-docker run --gpus all -p 8080:80 -e "WORKERS=1" -e "EXECUTION_PROVIDER=TensorrtExecutionProvider"  --name="rt_test" -it serve:latest
-```
- 
-**Note** You will need to move a `model.onnx` into the `/deploy/model` directory if you wish to deploy a model. 
-
-#### Running the image iteractively 
-
-`docker run --gpus all -p 8080:8080 -it serve:latest /bin/bash`
-
-**Note** This will require Nvidia docker. You will enter the container at `/workspace`. 
-
-From within the container, enter the command: `../app && python main.py` 
-To start the server. Obviously you can start the server with single command rather than entering into the container, but the `entrypoint` of the dockerfile needs to be configured
-Go to 
-```
-http://0.0.0.0:8080/docs
-```
-to test out the enpoint via the swagger UI. 
-
-
-
 ## To do: 14 Jan 2025
 - [x] develop frontend javascript to use mediaRecorder in browser to recorder 1.5 seconds of audio to send to backend service serving kws model. 
-- [ ] Containerise the fitting of the models and make sure access is provided. 
-- [ ] You need to be able to run the entire pipeline with docker-compose. The issue that is currently persisting is the decoding of the [opus]() which you are currently tracking via [here](https://stackoverflow.com/questions/79325937/audio-stream-how-to-decode-opus-format-being-streamed-from-browser-to-server)
+- [x] Containerise the fitting of the models and make sure access is provided.
+- [ ] Standardise docker `ENTRYPOINT`. Want to be able to supply `command` in `docker-compose.yaml` such ports and host ips can be configured from one file, the `docker-compose.yaml` file. 
+
+- [ ] connect serving model to frontend once a trained model has been created. 
+- [ ] finish writing tests. 
+- [ ] using `npm` and `webpack` and bootstrap to provide styling to the frontend. Follow [this](https://getbootstrap.com/docs/5.3/getting-started/webpack/) tutorial. This will require refactoring the current frontend directoris into a `src/` and `dist/` directories. But it will allow you in the future to bundle js and css modules together for a production env and localise all our editing into one location; `src/`.
+- [ ] Clean the serving application. Currently, there is preprocessing occuring inside of the application, this shouldnt be happening at the API level. Preferable onnx handles the transformations too. 
+
+- [ ] You need to be able to run the entire pipeline with docker-compose. Close to having end to end state. need to figure out the data loading issue. 
+
+- [ ] Add information to readme on dataset directory structure expectations so user can easily use their own datasets to train models but dropping them into the correct location.  
 
 - [ ] Figure out issue with tensorrt: you are currently tracking this issue via [here](https://github.com/onnx/onnx-tensorrt/issues/1009). Cannot use as execution provider CUDA, but not tensorrt for the speed up of merging the weights and biases. 
-- [ ] figure out how to include the `kms` library in the fitting container. Its part of private repository so running -e  
-
 - [ ] Review https://pytorch.org/audio/stable/_modules/torchaudio/models/wav2vec2/model.html#Wav2Vec2Model, test exporting the feature extractor of huggingface as part of the model architecture
 - [ ] Normalisation approach: apply PCEN https://github.com/daemon/pytorch-pcen
-- [ ] From onnx to TFlite -> implement basic converted and test against chris
-  butcher
 - [ ] Integrate feature extraction into model architecture using opset 17 and torch nightly via https://github.com/qiuqiangkong/torchlibrosa TRIED AND TESTED: WORKS FOR OPSET 17
 
 
