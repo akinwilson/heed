@@ -32,16 +32,20 @@
   <body>
     <div id="main">
       <button id="recordButton">Start Recording</button>
-      <button id="deleteButton" style="display: none">Delete Recording</button>
+      <!-- <button id="deleteButton" style="display: none">Delete Recording</button> -->
       <audio id="audioPlayer" controls style="display: none"></audio>
-      <canvas id="predictions" width="800" height="400"></canvas>
+      <!-- <img id="predictions" src="" /> -->
+      <img
+      src=""
+      id="predictions"
+    />
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
       // Get references to DOM elements
       const recordButton = document.getElementById("recordButton");
-      const deleteButton = document.getElementById("deleteButton");
+      // const deleteButton = document.getElementById("deleteButton");
       const audioPlayer = document.getElementById("audioPlayer");
 
       let mediaRecorder;
@@ -60,8 +64,8 @@
               mediaRecorder.ondataavailable = (event) => {
                 audioBlob = event.data;
                 audioUrl = URL.createObjectURL(audioBlob);
-                audioFile = new File([audioBlob], "recorded_audio.wav", {
-                  type: "audio/wav",
+                audioFile = new File([audioBlob], "recorded_audio.ogg", {
+                  type: "audio/ogg",
                 });
 
                 // Create audio player and show it
@@ -69,7 +73,7 @@
                 audioPlayer.style.display = "block";
 
                 // Enable the delete button
-                deleteButton.style.display = "inline-block";
+                // deleteButton.style.display = "inline-block";
 
                 // Send the audio to the backend
                 sendAudioToBackend(audioFile);
@@ -95,9 +99,9 @@
         }
       }
 
-      const csrftoken = document.querySelector(
-        "[name=csrfmiddlewaretoken]"
-      ).value;
+      // const csrftoken = document.querySelector(
+      //   "[name=csrfmiddlewaretoken]"
+      // ).value;
 
       // Function to send audio to the backend using AJAX
       function sendAudioToBackend(audioFile) {
@@ -106,24 +110,27 @@
 
         // formData.append("csrfmiddlewaretoken", {% csrf_token %} )
         $.ajax({
-          url: "http://127.0.0.1:8000/heed/upload_audio/", // Replace with your backend endpoint
+          url: "http://127.0.0.1:8000/upload_audio/", // Replace with your backend endpoint
           type: "POST",
-          headers: { "X-CSRFToken": csrftoken },
+          // headers: { "X-CSRFToken": csrftoken },
           data: formData,
           processData: false,
           contentType: false,
           success: function (response) {
             console.log("Audio file successfully uploaded to the backend.");
-            let message = JSON.parse(response.data);
-            if (message.image_uri) {
-              let img = new Image();
-              img.onload = function () {
-                const canvas = document.getElementById("predictions");
-                const ctx = canvas.getContext("2d");
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0);
-              };
-              img.src = "data:image/png;base64," + message.image_uri;
+            console.log("Response.image_uri: ", response.image_uri)
+            // let message = JSON.parse(response.data);
+            // console.log("message: ", message)
+            if (response.image_uri) {
+              console.log("Trying to draw image ")
+              // let img = new Image();
+              // img.onload = function () {
+              img = document.getElementById("predictions");
+              // const ctx = canvas.getContext("2d");
+              // ctx.clearRect(0, 0, canvas.width, canvas.height);
+              // ctx.drawImage(img, 0, 0);
+              // };
+              img.src = "data:image/png;base64," + response.image_uri;
             }
             // let img = new Image();
             // img.onload = function () {
@@ -141,15 +148,15 @@
       }
 
       // Function to delete the recorded file from the browser
-      function deleteRecording() {
-        audioPlayer.style.display = "none";
-        deleteButton.style.display = "none";
-        audioPlayer.src = ""; // Clear the audio source
-      }
+      // function deleteRecording() {
+      //   audioPlayer.style.display = "none";
+      //   deleteButton.style.display = "none";
+      //   audioPlayer.src = ""; // Clear the audio source
+      // }
 
       // Event listeners
       recordButton.addEventListener("click", startRecording);
-      deleteButton.addEventListener("click", deleteRecording);
+      // deleteButton.addEventListener("click", deleteRecording);
     </script>
   </body>
 </html>
