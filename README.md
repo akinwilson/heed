@@ -84,12 +84,12 @@ to test out the enpoint via the swagger UI.
 
 
 ## To do: 14 Jan 2025
-- [] develop frontend javascript to use mediaRecorder in browser to recorder 1.5 seconds of audio to send to backend service serving kws model. 
-- [] Containerise the fitting of the models and make sure access is provided. 
-- [] You need to be able to run the entire pipeline with docker-compose. The issue that is currently persisting is the decoding of the [opus]() which you are currently tracking via [here](https://stackoverflow.com/questions/79325937/audio-stream-how-to-decode-opus-format-being-streamed-from-browser-to-server)
+- [ ] develop frontend javascript to use mediaRecorder in browser to recorder 1.5 seconds of audio to send to backend service serving kws model. 
+- [ ] Containerise the fitting of the models and make sure access is provided. 
+- [ ] You need to be able to run the entire pipeline with docker-compose. The issue that is currently persisting is the decoding of the [opus]() which you are currently tracking via [here](https://stackoverflow.com/questions/79325937/audio-stream-how-to-decode-opus-format-being-streamed-from-browser-to-server)
 
-- [] Figure out issue with tensorrt: you are currently tracking this issue via [here](https://github.com/onnx/onnx-tensorrt/issues/1009). Cannot use as execution provider CUDA, but not tensorrt for the speed up of merging the weights and biases. 
-- [] figure out how to include the `kms` library in the fitting container. Its part of private repository so running -e  
+- [ ] Figure out issue with tensorrt: you are currently tracking this issue via [here](https://github.com/onnx/onnx-tensorrt/issues/1009). Cannot use as execution provider CUDA, but not tensorrt for the speed up of merging the weights and biases. 
+- [ ] figure out how to include the `kms` library in the fitting container. Its part of private repository so running -e  
 
 - [ ] Review https://pytorch.org/audio/stable/_modules/torchaudio/models/wav2vec2/model.html#Wav2Vec2Model, test exporting the feature extractor of huggingface as part of the model architecture
 - [ ] Normalisation approach: apply PCEN https://github.com/daemon/pytorch-pcen
