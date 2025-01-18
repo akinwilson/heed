@@ -18,26 +18,29 @@ from io import BytesIO
 plt_colours = ["b", "g", "r", "c", "m", "y"]
 
 
-def plot_bar(prob=0.75):
-    fig, ax = plt.subplots()
-    x = ['Keyword', 'Not keyword']
-    h = [prob, 1-prob]
-    ax.bar(x,h)
-    buffer = io.BytesIO()
-    fig.savefig(buffer, format="png")
-    buffer.seek(0)
-    plot_encoded = base64.b64decode(buffer.read())
-    uri = urllib.parse.quote(plot_encoded)
-    return uri 
+# def plot_bar(prob=0.75):
+#     fig, ax = plt.subplots()
+#     x = ['Keyword', 'Not keyword']
+#     h = [prob, 1-prob]
+#     ax.bar(x,h)
+#     buffer = io.BytesIO()
+#     fig.savefig(buffer, format="png")
+#     buffer.seek(0)
+#     plot_encoded = base64.b64decode(buffer.read())
+#     uri = urllib.parse.quote(plot_encoded)
+#     return uri 
 
 def plot(pcm=None, c=plt_colours[1]):
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(3, 1.5))
     # x = np.linspace(0, 2 * np.pi, 1000)
     # y = [np.cos(_x) for _x in x]
     # ax.plot(x, y, "*", color=c)
     ax.plot(pcm,color=c)
+    ax.axis('off')
+    ax.spines[['right', 'top', 'left', 'bottom']].set_visible(False)
+
     buf = io.BytesIO()
-    fig.savefig(buf, format="png")
+    fig.savefig(buf, format="png" ,dpi=200)
     buf.seek(0)
     string = base64.b64encode(buf.read())
     uri = urllib.parse.quote(string)
@@ -86,11 +89,11 @@ def upload(request):
             print("pcm_avg.shape: ", pcm_avg.shape)
             # print("file.__dict__",file.__dict__ )
 
-    return JsonResponse({'image_uri':plot(pcm=pcm_avg)}) 
+        return JsonResponse({'image_uri':plot(pcm=pcm_avg)}) 
     
 def index(request):
-    print("hello")
-    return render(request, "heed/index3.html") # , {"image_uri": plot()}
+    # print("hello")
+    return render(request, "heed/index.html") # , {"image_uri": plot()}
 
     # )  # HttpResponse("First response")
 

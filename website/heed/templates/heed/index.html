@@ -6,7 +6,7 @@
     <title>Heed</title>
     <style>
       img {
-        translate: -160px;
+        translate: -170px;
       }
 
       table {
@@ -40,35 +40,34 @@
   <body>
     <div id="main">
       <h1>heed</h1>
-      <p>Say <it>'Hello Akin'</it> </p>
+      <p>Say <i>'Hello Akin'</i> </p>
       <button id="recordButton">Start Recording</button>
       <!-- <button id="deleteButton" style="display: none">Delete Recording</button> -->
       <audio id="audioPlayer" controls style="display: none"></audio>
       <!-- <img id="predictions" src="" /> -->
       
-      <table id="results">
-        <thead>
-          <tr>
-            <th scope="col">Event</th>
-            <th scope="col">Probability</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">Keyword</th>
-            <td>0.22</td>
-          </tr>
-          <tr>
-            <th scope="row">Not keyword</th>
-            <td>0.78</td>
-          </tr>
-        </tfoot>
-      </table>
-
       <img
       src=""
       id="predictions"
     />
+    <table id="results">
+      <thead>
+        <tr>
+          <th scope="col">Event</th>
+          <th scope="col">Probability</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">Keyword</th>
+          <td>0.22</td>
+        </tr>
+        <tr>
+          <th scope="row">Not keyword</th>
+          <td>0.78</td>
+        </tr>
+      </tfoot>
+    </table>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
