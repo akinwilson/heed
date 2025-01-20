@@ -1,5 +1,5 @@
 FROM nvidia/cuda:11.2.0-runtime-ubuntu20.04
-LABEL maintainer="Akinola Antony Wilson <akinola.wilson@sky.com>"
+LABEL maintainer="Akinola Antony Wilson <akinolawilson@gmail.com>"
 
 # Allow passing in decision threshold and model version during build of serving container.
 ARG DECISION_THRESHOLD=0.5
