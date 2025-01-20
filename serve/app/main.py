@@ -24,8 +24,8 @@ from schema import *
 
 # Initialize API Server
 app = FastAPI(
-    title="Audio Key-word Spotting",
-    description="Torch-based deep learning model trained to 'spot' a key-word; hello glsss",
+    title="Keyword Spotting",
+    description="Torch-based deep learning model trained to 'spot' a keyword; hello akin",
     version="0.0.1",
     terms_of_service=None,
     contact=None,
