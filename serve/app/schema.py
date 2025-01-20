@@ -24,7 +24,7 @@ class InferenceResult(BaseModel):
     Inference result from the model: As previously defied
     """
 
-    wake_word_probability: float = Field(
+    keyword_probability: float = Field(
         ..., example=0.987526, title="Probablity of keyword"
     )
     prediction: float = Field(..., example=1.0, title="Predicted label")

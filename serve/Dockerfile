@@ -21,23 +21,16 @@ RUN python3 -m pip --no-cache-dir install --upgrade pip && \
     python3 --version && \
     pip3 --version
 
-COPY ./torch-deploy/requirements.txt .
+COPY ./requirements.txt .
 RUN pip3 --timeout=300 --no-cache-dir install -r requirements.txt
-# ml packaged code 
-COPY ./app /ml-app
-RUN pip3 install -e ./ml-app
 
 # Copy model files
-COPY ./torch-deploy/model /model
-RUN pip3 --timeout=300 --no-cache-dir install -r requirements.txt
+COPY ./model /model
+
 # Copy app files
-COPY ./torch-deploy/app /app
+COPY ./app /app
 
-# WORKDIR /app/
-# ENV PYTHONPATH=/app
-# RUN ls -lah /app/*
-
-COPY ./torch-deploy/start.sh /start.sh
+COPY ./start.sh /start.sh
 RUN chmod +x /start.sh
 
 EXPOSE 80
